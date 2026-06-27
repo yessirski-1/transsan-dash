@@ -63,7 +63,7 @@
         </div>
         <div style="font-family:'Spline Sans Mono',monospace;font-size:12px;color:#6a7079;margin-top:8px">MT · vs <span style="color:#9aa0ab">{{ heroPrev }}</span> em Maio (até dia {{ heroDay }})</div>
         <div style="margin-top:18px">
-          <div style="display:flex;justify-content:space-between;align-items:center"><div style="font-size:11px;color:#6a7079">Ritmo do mês · dia 27/30</div><div style="font-family:'Spline Sans Mono',monospace;font-size:12px;color:var(--ac,#e0a93b);font-weight:600">{{ paceProj }} proj.</div></div>
+          <div style="display:flex;justify-content:space-between;align-items:center"><div style="font-size:11px;color:#6a7079">Ritmo do mês · dia {{ dayLabel }}</div><div style="font-family:'Spline Sans Mono',monospace;font-size:12px;color:var(--ac,#e0a93b);font-weight:600">{{ paceProj }} proj.</div></div>
           <div style="height:6px;border-radius:3px;background:#1c212a;margin-top:8px;overflow:hidden"><div style="width:{{ paceBarPct }}%;height:100%;background:var(--ac,#e0a93b);border-radius:3px"></div></div>
           <div style="font-size:11px;color:#5f646e;margin-top:7px">{{ pacePct }}</div>
         </div>
@@ -292,17 +292,17 @@ class Component extends DCLogic {
   fmtK(n){ return (n/1000).toFixed(0)+'k'; }
   fmtShort(n){ return n>=1e6 ? (n/1e6).toFixed(2)+'M' : Math.round(n/1000)+'k'; }
 
-  refresh = () => this.setState({ expanded:null });
+  refresh = () => location.reload();
   toggle = (name) => this.setState(s => ({ expanded: s.expanded===name ? null : name }));
 
   buildSpark(W,H,drivers){
     const byDay={}; drivers.forEach(d=>d.trips.forEach(t=>{ byDay[t[0]]=(byDay[t[0]]||0)+t[4]; }));
-    let cum=0; const pts=[]; for(let day=1;day<=27;day++){ cum+=(byDay[day]||0); pts.push([day,cum]); }
+    let cum=0; const pts=[]; for(let day=1;day<=((window.TRANSSAN_DATA.summary||{}).today||27);day++){ cum+=(byDay[day]||0); pts.push([day,cum]); }
     const proj=6540000, max=proj*1.04;
     const x=d=>((d-1)/29)*W, y=v=>H-(v/max)*(H-8)-4;
     let line=''; pts.forEach((p,i)=>{ line+=(i===0?'M':'L')+x(p[0]).toFixed(1)+' '+y(p[1]).toFixed(1)+' '; });
     const lastX=x(27), lastY=y(cum);
-    return { line, area:line+'L'+lastX.toFixed(1)+' '+H+' L0 '+H+' Z', projPath:'M'+lastX.toFixed(1)+' '+lastY.toFixed(1)+' L'+x(30).toFixed(1)+' '+y(proj).toFixed(1), lastX:lastX.toFixed(1), lastY:lastY.toFixed(1) };
+    return { line, area:line+'L'+lastX.toFixed(1)+' '+H+' L0 '+H+' Z', projPath:'M'+lastX.toFixed(1)+' '+lastY.toFixed(1)+' L'+x(((window.TRANSSAN_DATA.summary||{}).daysInMonth||30)).toFixed(1)+' '+y(proj).toFixed(1), lastX:lastX.toFixed(1), lastY:lastY.toFixed(1) };
   }
 
   navStyle(active){
@@ -317,7 +317,7 @@ class Component extends DCLogic {
     const data = D.drivers, years = D.years, ML = D.monthLabels;
 
     const base = {
-      accent:this.props.accent ?? '#e0a93b', dateStr:'27/06 · 13:17', refresh:this.refresh,
+      accent:this.props.accent ?? '#e0a93b', dateStr:(window.TRANSSAN_DATA.summary||{}).dateStr, refresh:this.refresh,
       navItems:[
         {label:'Mês', go:()=>this.setState({view:'mes'}), style:this.navStyle(view==='mes')},
         {label:'Anos', go:()=>this.setState({view:'anos'}), style:this.navStyle(view==='anos')},
@@ -337,7 +337,7 @@ class Component extends DCLogic {
           activeToday:d.active, fuelFmt:(Math.round(fuel*10)/10)+'L', showFuelChip:showFuel&&fuel!==0, open:expanded===d.name, toggle:()=>this.toggle(d.name),
           trips:d.trips.map(t=>({ dayFmt:String(t[0]).padStart(2,'0')+'/06', mine:t[1]||'—', tons:t[2].toFixed(2), ll:this.fmt(t[4]) })) };
       });
-      const todayTrips=[]; data.forEach(d=>d.trips.forEach(t=>{ if(t[0]===27) todayTrips.push({driver:d.name,mine:t[1],tons:t[2].toFixed(1),ll:this.fmt(t[4]),llNum:t[4],tonsNum:t[2]}); }));
+      const todayTrips=[]; data.forEach(d=>d.trips.forEach(t=>{ if(t[0]===((window.TRANSSAN_DATA.summary||{}).today||27)) todayTrips.push({driver:d.name,mine:t[1],tons:t[2].toFixed(1),ll:this.fmt(t[4]),llNum:t[4],tonsNum:t[2]}); }));
       const tll=todayTrips.reduce((a,t)=>a+t.llNum,0), ttons=todayTrips.reduce((a,t)=>a+t.tonsNum,0);
       const ausentes=data.filter(d=>!d.active).map(d=>d.name), activeN=data.filter(d=>d.active).length;
       const mineMap={}; data.forEach(d=>d.trips.forEach(t=>{ const m=t[1]||'—'; if(!mineMap[m])mineMap[m]={name:m,count:0,tons:0,ll:0}; mineMap[m].count++; mineMap[m].tons+=t[2]; mineMap[m].ll+=t[4]; }));
@@ -346,7 +346,7 @@ class Component extends DCLogic {
       else { arr.forEach(m=>m.per=m.ll/m.count); arr.sort((a,b)=>b.per-a.per); const mp=arr[0].per; mines=arr.map(m=>({name:m.name,primary:this.fmtK(m.per),secondary:'/viag · '+m.count+'v',pct:Math.round(m.per/mp*100)})); mineNote='BILA e SAFKHULA pagam mais por viagem, mas têm portagens altas. ENERGIM ganha pela escala (42 viagens).'; }
       const tab=(on)=> on?'font-size:11px;font-weight:600;padding:6px 13px;border-radius:6px;cursor:pointer;background:var(--ac,#e0a93b);color:#0c0e12':'font-size:11px;font-weight:600;padding:6px 13px;border-radius:6px;cursor:pointer;background:transparent;color:#8a909a';
       const sp=this.buildSpark(560,150,data);
-      const S=(window.TRANSSAN_DATA.summary)||{}; mes={ heroLL:S.heroLL, heroPrev:S.heroPrev, heroDay:S.heroDay, heroDelta:S.heroDelta, sparkAreaD:sp.area, sparkLineD:sp.line, sparkProjD:sp.projPath, dotXD:sp.lastX, dotYD:sp.lastY,
+      const S=(window.TRANSSAN_DATA.summary)||{}; mes={ heroLL:S.heroLL, dayLabel:S.dayLabel, heroPrev:S.heroPrev, heroDay:S.heroDay, heroDelta:S.heroDelta, sparkAreaD:sp.area, sparkLineD:sp.line, sparkProjD:sp.projPath, dotXD:sp.lastX, dotYD:sp.lastY,
         paceProj:S.paceProj, paceBarPct:S.paceBarPct, pacePct:S.pacePct,
         kpis:S.kpis,
         today:{ viagens:todayTrips.length, tons:ttons.toFixed(0), ll:this.fmtK(tll), delta:'+36%', trips:todayTrips, activeCount:activeN, totalDrivers:data.length, ausentesNames:ausentes.slice(0,4).join(', ')+' +'+(ausentes.length-4) },
