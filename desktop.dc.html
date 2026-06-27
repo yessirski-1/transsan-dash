@@ -16,7 +16,7 @@
   body{margin:0;background:#08090c;font-family:'Archivo',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
   ::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:#23272f;border-radius:4px}
 </style>
-<script src="transsan-data.js?v=1782572309"></script><script src="transsan-trips.js?v=1782572309"></script>
+<script src="transsan-data.js?v=1782576099"></script><script src="transsan-trips.js?v=1782576099"></script>
 
 </helmet>
 <template id="__bundler_thumbnail" data-bg-color="#08090c">
@@ -144,7 +144,7 @@
 
         <!-- Motoristas -->
         <div style="background:#11141a;border:0.5px solid #1f242d;border-radius:16px;padding:20px">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px"><div style="font-size:12px;letter-spacing:.12em;color:#8a909a;font-weight:700;text-transform:uppercase">Motoristas · 14 activos</div><div style="font-size:11px;color:#5f646e">clica para ver viagens</div></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px"><div style="font-size:12px;letter-spacing:.12em;color:#8a909a;font-weight:700;text-transform:uppercase">Motoristas · {{ today.totalDrivers }} activos</div><div style="font-size:11px;color:#5f646e">clica para ver viagens</div></div>
           <div style="display:flex;flex-direction:column;gap:8px">
             <sc-for list="{{ drivers }}" as="d" hint-placeholder-count="14">
               <div style="background:#0f131a;border:0.5px solid #1c2029;border-radius:12px;overflow:hidden">
@@ -272,7 +272,7 @@
   </div>
   </sc-if>
 
-  <div style="text-align:center;margin-top:32px;font-size:11px;color:#3f444c;letter-spacing:.04em">TRANSSAN PTY · 2022–2026 · atualizado 27/06 13:17</div>
+  <div style="text-align:center;margin-top:32px;font-size:11px;color:#3f444c;letter-spacing:.04em">TRANSSAN PTY · 2022–2026 · atualizado {{ dateStr }}</div>
 
 </div>
 </div>
