@@ -1,2 +1,8 @@
-<!doctype html><meta charset="utf-8"><title>TRANSSAN</title>
-<script>location.replace((innerWidth<=640?'mobile':'desktop')+'.dc.html')</script>
+<!doctype html><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TRANSSAN</title>
+<script>
+var m=/Mobi|Android|iPhone|iPod|iPad|Windows Phone/i.test(navigator.userAgent)
+  || Math.min(screen.width,screen.height)<=640;
+location.replace((m?'mobile':'desktop')+'.dc.html');
+</script>
