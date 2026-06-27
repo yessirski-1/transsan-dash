@@ -16,8 +16,8 @@
   body{margin:0;background:#08090c;font-family:'Archivo',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
   ::-webkit-scrollbar{width:0;height:0}
 </style>
-<script src="transsan-data.js"></script>
-<script src="transsan-trips.js"></script>
+<script src="transsan-data.js?v=1782572309"></script><script src="transsan-trips.js?v=1782572309"></script>
+
 </helmet>
 <template id="__bundler_thumbnail" data-bg-color="#08090c">
   <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
@@ -311,7 +311,7 @@ class Component extends DCLogic {
   fmtK(n){ return (n/1000).toFixed(0)+'k'; }
   fmtShort(n){ return n>=1e6 ? (n/1e6).toFixed(2)+'M' : Math.round(n/1000)+'k'; }
 
-  refresh = () => location.reload();
+  refresh = () => location.replace(location.pathname+'?v='+Date.now());
   toggle = (name) => this.setState(s => ({ expanded: s.expanded===name ? null : name }));
 
   buildSpark(W,H,drivers){

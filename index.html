@@ -4,5 +4,5 @@
 <script>
 var m=/Mobi|Android|iPhone|iPod|iPad|Windows Phone/i.test(navigator.userAgent)
   || Math.min(screen.width,screen.height)<=640;
-location.replace((m?'mobile':'desktop')+'.dc.html');
+location.replace((m?'mobile':'desktop')+'.dc.html?v='+Date.now());
 </script>
