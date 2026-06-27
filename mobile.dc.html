@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#08090c;font-family:'Archivo',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  ::-webkit-scrollbar{width:0;height:0}
+</style>
+<script src="transsan-data.js"></script>
+<script src="transsan-trips.js"></script>
+</helmet>
+<template id="__bundler_thumbnail" data-bg-color="#08090c">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#08090c"></rect>
+    <g fill="#e0a93b">
+      <rect x="372" y="520" width="84" height="120" rx="8"></rect>
+      <rect x="492" y="450" width="84" height="190" rx="8"></rect>
+      <rect x="612" y="360" width="84" height="280" rx="8"></rect>
+      <rect x="732" y="270" width="84" height="370" rx="8"></rect>
+    </g>
+    <text x="600" y="210" fill="#f4f6f8" font-family="Arial,sans-serif" font-size="86" font-weight="800" letter-spacing="6" text-anchor="middle">TRANSSAN</text>
+  </svg>
+</template>
+
+<div style="--ac:{{ accent }};min-height:100vh;background:radial-gradient(120% 60% at 50% 0%,#10131a 0%,#0a0c10 55%,#08090c 100%);padding-bottom:40px">
+<div style="max-width:430px;margin:0 auto;position:relative">
+
+  <!-- HEADER + NAV -->
+  <div style="position:sticky;top:0;z-index:20;background:rgba(8,9,12,0.78);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:0.5px solid #1c2029">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 18px 9px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="background:#fff;border-radius:6px;padding:4px 7px;display:flex;align-items:center"><img src="transsan-logo.png" alt="TRANSSAN" style="height:16px;display:block"></div>
+        <span style="color:#6a7079;font-size:10px;font-weight:700;letter-spacing:.08em">PTY</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="font-family:'Spline Sans Mono',monospace;font-size:11px;color:#5f646e">{{ dateStr }}</div>
+        <div onClick="{{ refresh }}" style="width:30px;height:30px;border-radius:50%;border:0.5px solid #262b34;display:flex;align-items:center;justify-content:center;color:#9aa0ab;font-size:15px;cursor:pointer">↻</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:4px;padding:0 14px 11px">
+      <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="3"><div onClick="{{ n.go }}" style="{{ n.style }}">{{ n.label }}</div></sc-for>
+    </div>
+  </div>
+
+  <div style="padding:18px 18px 0">
+
+  <!-- ===================== VIEW: MÊS ===================== -->
+  <sc-if value="{{ isMes }}" hint-placeholder-val="{{ true }}">
+  <div>
+    <div style="font-size:11px;letter-spacing:.16em;color:#6a7079;font-weight:700;text-transform:uppercase;margin-bottom:8px">Lucro líquido · Junho 2026</div>
+    <div style="display:flex;align-items:flex-end;gap:12px">
+      <div style="font-family:'Spline Sans Mono',monospace;font-size:46px;font-weight:600;color:#f4f6f8;letter-spacing:-.02em;line-height:1.12;padding-bottom:2px">{{ heroLL }}</div>
+      <div style="display:flex;align-items:center;gap:5px;background:rgba(70,179,94,0.12);border:0.5px solid rgba(70,179,94,0.3);border-radius:7px;padding:4px 8px;margin-bottom:6px">
+        <span style="color:#52c06a;font-size:11px">▲</span><span style="color:#52c06a;font-size:12px;font-weight:700">{{ heroDelta }}</span>
+      </div>
+    </div>
+    <div style="font-family:'Spline Sans Mono',monospace;font-size:11px;color:#6a7079;margin-top:6px">MT · vs <span style="color:#9aa0ab">{{ heroPrev }}</span> em Maio (até dia {{ heroDay }})</div>
+
+    <div style="margin-top:16px;background:#11141a;border:0.5px solid #1f242d;border-radius:14px;padding:14px 14px 12px">
+      <svg viewBox="0 0 320 78" preserveAspectRatio="none" style="width:100%;height:78px;display:block">
+        <defs><linearGradient id="ag" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#e0a93b" stop-opacity="0.28"/><stop offset="100%" stop-color="#e0a93b" stop-opacity="0"/></linearGradient></defs>
+        <path d="{{ sparkArea }}" fill="url(#ag)"></path>
+        <path d="{{ sparkProj }}" fill="none" stroke="#3a3f49" stroke-width="1.4" stroke-dasharray="3,3" stroke-linecap="round"></path>
+        <path d="{{ sparkLine }}" fill="none" style="stroke:var(--ac,#e0a93b)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></path>
+        <circle cx="{{ dotX }}" cy="{{ dotY }}" r="5.5" fill="#e0a93b" opacity="0.18"></circle>
+        <circle cx="{{ dotX }}" cy="{{ dotY }}" r="3" fill="#e0a93b" stroke="#11141a" stroke-width="1.6"></circle>
+      </svg>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:11px;border-top:0.5px solid #1c2029">
+        <div style="font-size:11px;color:#6a7079">Ritmo do mês <span style="color:#5f646e">· dia 27/30</span></div>
+        <div style="font-family:'Spline Sans Mono',monospace;font-size:11.5px;color:var(--ac,#e0a93b);font-weight:600">{{ paceProj }} proj.</div>
+      </div>
+      <div style="height:5px;border-radius:3px;background:#1c212a;margin-top:8px;overflow:hidden"><div style="width:{{ paceBarPct }}%;height:100%;background:var(--ac,#e0a93b);border-radius:3px"></div></div>
+      <div style="font-size:10.5px;color:#5f646e;margin-top:7px">{{ pacePct }}</div>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin:24px 2px 10px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:7px;height:7px;border-radius:50%;background:var(--ac,#e0a93b);box-shadow:0 0 0 3px rgba(224,169,59,0.15)"></div>
+        <div style="font-size:12px;letter-spacing:.14em;color:#f1f3f6;font-weight:800;text-transform:uppercase">Hoje · 27/06</div>
+      </div>
+      <div style="font-size:11px;color:#52c06a;font-weight:700">▲ {{ today.delta }} vs média/dia</div>
+    </div>
+
+    <div style="background:linear-gradient(180deg,#141821,#11141a);border:0.5px solid #242a34;border-left:3px solid var(--ac,#e0a93b);border-radius:15px;padding:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div style="font-size:13px;color:#d4d8de;font-weight:600">Resumo do dia</div>
+        <div style="font-family:'Spline Sans Mono',monospace;font-size:10px;color:#5f646e">{{ today.mix }}</div>
+      </div>
+      <div style="display:flex;gap:9px;margin-bottom:15px">
+        <div style="flex:1;background:#0f131a;border:0.5px solid #1f242d;border-radius:11px;padding:12px 0;text-align:center"><div style="font-family:'Spline Sans Mono',monospace;font-size:24px;color:#f4f6f8;font-weight:600">{{ today.viagens }}</div><div style="font-size:9px;letter-spacing:.1em;color:#5f646e;margin-top:2px;text-transform:uppercase">Viagens</div></div>
+        <div style="flex:1;background:#0f131a;border:0.5px solid #1f242d;border-radius:11px;padding:12px 0;text-align:center"><div style="font-family:'Spline Sans Mono',monospace;font-size:24px;color:#f4f6f8;font-weight:600">{{ today.tons }}<span style="font-size:13px;color:#6a7079">t</span></div><div style="font-size:9px;letter-spacing:.1em;color:#5f646e;margin-top:2px;text-transform:uppercase">Tons</div></div>
+        <div style="flex:1.2;background:linear-gradient(180deg,rgba(224,169,59,0.12),rgba(224,169,59,0.03));border:0.5px solid rgba(224,169,59,0.25);border-radius:11px;padding:12px 0;text-align:center"><div style="font-family:'Spline Sans Mono',monospace;font-size:24px;color:var(--ac,#e0a93b);font-weight:600">{{ today.ll }}</div><div style="font-size:9px;letter-spacing:.1em;color:#b8862a;margin-top:2px;text-transform:uppercase">LL · MT</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1.5fr 0.9fr 0.5fr 0.85fr;gap:6px;padding-bottom:8px;border-bottom:0.5px solid #1f242d">
+        <div style="font-size:8.5px;letter-spacing:.08em;color:#5f646e;text-transform:uppercase">Driver</div><div style="font-size:8.5px;letter-spacing:.08em;color:#5f646e;text-transform:uppercase">Mina</div><div style="font-size:8.5px;letter-spacing:.08em;color:#5f646e;text-transform:uppercase;text-align:right">T</div><div style="font-size:8.5px;letter-spacing:.08em;color:#5f646e;text-transform:uppercase;text-align:right">LL</div>
+      </div>
+      <sc-for list="{{ today.trips }}" as="t" hint-placeholder-count="5">
+        <div style="display:grid;grid-template-columns:1.5fr 0.9fr 0.5fr 0.85fr;gap:6px;padding:9px 0;border-bottom:0.5px solid #161a21;align-items:center">
+          <div style="font-size:12px;color:#e7eaee;font-weight:600">{{ t.driver }}</div><div style="font-size:9.5px;color:#8a909a">{{ t.mine }}</div><div style="font-family:'Spline Sans Mono',monospace;font-size:10px;color:#8a909a;text-align:right">{{ t.tons }}</div><div style="font-family:'Spline Sans Mono',monospace;font-size:11px;color:var(--ac,#e0a93b);text-align:right;font-weight:600">{{ t.ll }}</div>
+        </div>
+      </sc-for>
+      <div style="margin-top:12px;display:flex;align-items:center;gap:8px;background:#0f131a;border-radius:9px;padding:9px 11px"><div style="width:5px;height:5px;border-radius:50%;background:#6a7079;flex-shrink:0"></div><div style="font-size:10.5px;color:#8a909a;line-height:1.4"><span style="color:#d4d8de;font-weight:600">{{ today.activeCount }}/{{ today.totalDrivers }} activos.</span> Ausentes: {{ today.ausentesNames }}</div></div>
+    </div>
+
+    <div style="font-size:11px;letter-spacing:.14em;color:#6a7079;font-weight:700;text-transform:uppercase;margin:24px 2px 10px">Mês · resumo</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px">
+      <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
+        <div style="background:#11141a;border:0.5px solid #1f242d;border-radius:11px;padding:11px 9px"><div style="font-size:8.5px;letter-spacing:.08em;color:#5f646e;text-transform:uppercase">{{ k.l }}</div><div style="font-family:'Spline Sans Mono',monospace;font-size:15px;color:#e7eaee;margin-top:5px;font-weight:500">{{ k.v }}</div></div>
+      </sc-for>
+    </div>
+
+    <div style="margin-top:14px;background:#11141a;border:0.5px solid #1f242d;border-radius:14px;padding:14px 15px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><div style="font-size:11px;letter-spacing:.1em;color:#8a909a;font-weight:700;text-transform:uppercase">vs Maio</div><div style="font-size:11px;color:#52c06a;font-weight:600">▲ +257k MT (+4%)</div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <sc-for list="{{ vs }}" as="v" hint-placeholder-count="4">
+          <div style="display:flex;align-items:center;justify-content:space-between;background:#0f131a;border-radius:10px;padding:10px 12px"><div><div style="font-size:9px;letter-spacing:.06em;color:#5f646e;text-transform:uppercase">{{ v.l }}</div><div style="font-family:'Spline Sans Mono',monospace;font-size:15px;color:#e7eaee;margin-top:3px;font-weight:500">{{ v.val }}</div><div style="font-family:'Spline Sans Mono',monospace;font-size:9.5px;color:#5f646e;margin-top:1px">{{ v.prev }}</div></div><div style="font-size:11px;color:#52c06a;font-weight:700">{{ v.delta }}</div></div>
+        </sc-for>
+      </div>
+      <div style="margin-top:12px;font-size:10.5px;color:#8a909a;line-height:1.45;background:#0f131a;border-radius:9px;padding:9px 11px">{{ vsProj }}</div>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin:24px 2px 10px"><div style="font-size:11px;letter-spacing:.14em;color:#6a7079;font-weight:700;text-transform:uppercase">Motoristas · 14 activos</div><div style="font-size:10px;color:#5f646e">toca para ver viagens</div></div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <sc-for list="{{ drivers }}" as="d" hint-placeholder-count="14">
+        <div style="background:#11141a;border:0.5px solid #1f242d;border-radius:13px;overflow:hidden">
+          <div onClick="{{ d.toggle }}" style="padding:13px 14px;cursor:pointer">
+            <div style="display:flex;align-items:center;gap:11px">
+              <span style="font-family:'Spline Sans Mono',monospace;font-size:10px;color:#5f646e;width:20px">{{ d.rankFmt }}</span>
+              <div style="width:30px;height:30px;border-radius:50%;background:#1a1f28;border:0.5px solid #262b34;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#c2c7cf;flex-shrink:0">{{ d.initial }}</div>
+              <div style="flex:1;display:flex;align-items:center;gap:7px"><span style="font-size:14px;color:#eef0f3;font-weight:700">{{ d.name }}</span><sc-if value="{{ d.activeToday }}" hint-placeholder-val="{{ true }}"><span style="width:6px;height:6px;border-radius:50%;background:var(--ac,#e0a93b)" title="activo hoje"></span></sc-if></div>
+              <sc-if value="{{ d.up }}" hint-placeholder-val="{{ false }}"><span style="font-size:10px;color:#52c06a;font-weight:700">▲{{ d.changeTxt }}</span></sc-if>
+              <sc-if value="{{ d.down }}" hint-placeholder-val="{{ false }}"><span style="font-size:10px;color:#d65648;font-weight:700">▼{{ d.changeTxt }}</span></sc-if>
+              <span style="font-family:'Spline Sans Mono',monospace;font-size:14px;color:var(--ac,#e0a93b);font-weight:600">{{ d.llFmt }}</span>
+            </div>
+            <div style="height:4px;border-radius:2px;background:#1a1f28;margin-top:10px;overflow:hidden"><div style="width:{{ d.barPct }}%;height:100%;background:#2f3640;border-radius:2px"></div></div>
+            <div style="display:flex;gap:16px;margin-top:9px;padding-left:31px">
+              <div style="display:flex;align-items:baseline;gap:4px"><span style="font-family:'Spline Sans Mono',monospace;font-size:12px;color:#c2c7cf;font-weight:600">{{ d.viagens }}</span><span style="font-size:8.5px;color:#5f646e;text-transform:uppercase;letter-spacing:.05em">viag</span></div>
+              <div style="display:flex;align-items:baseline;gap:4px"><span style="font-family:'Spline Sans Mono',monospace;font-size:12px;color:#c2c7cf;font-weight:600">{{ d.tonsFmt }}</span><span style="font-size:8.5px;color:#5f646e;text-transform:uppercase;letter-spacing:.05em">tons</span></div>
+              <sc-if value="{{ d.showFuelChip }}" hint-placeholder-val="{{ false }}"><div style="display:flex;align-items:baseline;gap:4px"><span style="font-family:'Spline Sans Mono',monospace;font-size:12px;color:#d65648;font-weight:600">{{ d.fuelFmt }}</span><span style="font-size:8.5px;color:#5f646e;text-transform:uppercase;letter-spacing:.05em">fuel</span></div></sc-if>
+            </div>
+          </div>
+          <sc-if value="{{ d.open }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:2px 14px 14px;background:#0d1016">
+              <div style="display:grid;grid-template-columns:0.7fr 1fr 0.6fr 0.85fr;gap:6px;padding:9px 0 7px;border-bottom:0.5px solid #1f242d"><div style="font-size:8px;letter-spacing:.06em;color:#5f646e;text-transform:uppercase">Data</div><div style="font-size:8px;letter-spacing:.06em;color:#5f646e;text-transform:uppercase">Mina</div><div style="font-size:8px;letter-spacing:.06em;color:#5f646e;text-transform:uppercase;text-align:right">Tons</div><div style="font-size:8px;letter-spacing:.06em;color:#5f646e;text-transform:uppercase;text-align:right">LL</div></div>
+              <sc-for list="{{ d.trips }}" as="t" hint-placeholder-count="6">
+                <div style="display:grid;grid-template-columns:0.7fr 1fr 0.6fr 0.85fr;gap:6px;padding:7px 0;border-bottom:0.5px solid #14181f;align-items:center"><div style="font-family:'Spline Sans Mono',monospace;font-size:10px;color:#8a909a">{{ t.dayFmt }}</div><div style="font-size:10px;color:#a7adb6">{{ t.mine }}</div><div style="font-family:'Spline Sans Mono',monospace;font-size:10px;color:#8a909a;text-align:right">{{ t.tons }}</div><div style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;color:#52c06a;text-align:right">{{ t.ll }}</div></div>
+              </sc-for>
+              <div style="display:grid;grid-template-columns:0.7fr 1fr 0.6fr 0.85fr;gap:6px;padding:9px 0 0;align-items:center"><div style="font-size:9px;color:#c2c7cf;font-weight:700;letter-spacing:.05em">TOTAL</div><div style="font-family:'Spline Sans Mono',monospace;font-size:9.5px;color:#6a7079">{{ d.viagens }}v · {{ d.tonsFmt }}t</div><div></div><div style="font-family:'Spline Sans Mono',monospace;font-size:11px;color:var(--ac,#e0a93b);text-align:right;font-weight:600">{{ d.grossFmt }}</div></div>
+            </div>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin:24px 2px 10px">
+      <div style="font-size:11px;letter-spacing:.14em;color:#6a7079;font-weight:700;text-transform:uppercase">Minas</div>
+      <div style="display:flex;background:#11141a;border:0.5px solid #1f242d;border-radius:8px;padding:2px"><sc-for list="{{ mineTabs }}" as="mt" hint-placeholder-count="2"><div onClick="{{ mt.on }}" style="{{ mt.style }}">{{ mt.label }}</div></sc-for></div>
+    </div>
+    <div style="background:#11141a;border:0.5px solid #1f242d;border-radius:14px;padding:15px">
+      <sc-for list="{{ mines }}" as="m" hint-placeholder-count="7">
+        <div style="margin-bottom:13px"><div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:5px"><div style="font-size:12px;color:#e7eaee;font-weight:600">{{ m.name }}</div><div style="font-family:'Spline Sans Mono',monospace;font-size:11px;color:#a7adb6"><span style="color:var(--ac,#e0a93b);font-weight:600">{{ m.primary }}</span> <span style="color:#5f646e">{{ m.secondary }}</span></div></div><div style="height:6px;border-radius:3px;background:#1a1f28;overflow:hidden"><div style="width:{{ m.pct }}%;height:100%;background:var(--ac,#e0a93b);opacity:0.75;border-radius:3px"></div></div></div>
+      </sc-for>
+      <div style="font-size:10.5px;color:#8a909a;line-height:1.45;margin-top:4px;padding-top:12px;border-top:0.5px solid #1c2029">{{ mineNote }}</div>
+    </div>
+
+    <div style="font-size:11px;letter-spacing:.14em;color:#6a7079;font-weight:700;text-transform:uppercase;margin:24px 2px 10px">Portagens · estimativa</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+      <div style="background:#11141a;border:0.5px solid #1f242d;border-radius:12px;padding:13px"><div style="font-size:9px;letter-spacing:.08em;color:#5f646e;text-transform:uppercase">TRAC · MZ</div><div style="font-family:'Spline Sans Mono',monospace;font-size:18px;color:#e7eaee;margin-top:5px;font-weight:500">96k <span style="font-size:10px;color:#6a7079">MT</span></div><div style="font-size:9.5px;color:#5f646e;margin-top:3px">Conta 295963 · statement 06/09</div></div>
+      <div style="background:#11141a;border:0.5px solid #1f242d;border-radius:12px;padding:13px"><div style="font-size:9px;letter-spacing:.08em;color:#5f646e;text-transform:uppercase">SANRAL · SA</div><div style="font-family:'Spline Sans Mono',monospace;font-size:18px;color:#e7eaee;margin-top:5px;font-weight:500">R24,558</div><div style="font-size:9.5px;color:#5f646e;margin-top:3px">Conta 1479869 · 18 tags</div></div>
+    </div>
+    <div style="background:#11141a;border:0.5px solid #1f242d;border-radius:12px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between"><div style="font-size:11px;color:#8a909a">Total estimado por mina</div><div style="font-family:'Spline Sans Mono',monospace;font-size:15px;color:#e7eaee;font-weight:600">1.03M <span style="font-size:10px;color:#6a7079">MT</span></div></div>
+  </div>
+  </sc-if>
+
+  <!-- ===================== VIEW: ANOS ===================== -->
+  <sc-if value="{{ isAnos }}" hint-placeholder-val="{{ false }}">
+  <div>
+    <div style="font-size:11px;letter-spacing:.16em;color:#6a7079;font-weight:700;text-transform:uppercase;margin-bottom:10px">Lucro líquido por ano</div>
+    <!-- cross-year bars -->
+    <div style="background:#11141a;border:0.5px solid #1f242d;border-radius:14px;padding:16px 15px 12px;display:flex;align-items:flex-end;gap:9px;height:150px">
+      <sc-for list="{{ anosYears }}" as="y" hint-placeholder-count="5">
+        <div onClick="{{ y.select }}" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;cursor:pointer">
+          <div style="font-family:'Spline Sans Mono',monospace;font-size:9.5px;color:#a7adb6;margin-bottom:5px">{{ y.llShort }}</div>
+          <div style="width:100%;border-radius:4px 4px 0 0;height:{{ y.pct }}%;background:{{ y.barColor }};min-height:4px"></div>
+          <div style="font-size:11px;color:{{ y.labelColor }};margin-top:7px;font-weight:600">{{ y.year }}</div>
+        </div>
+      </sc-for>
+    </div>
+
+    <!-- year KPIs -->
+    <div style="display:flex;align-items:baseline;gap:8px;margin:22px 2px 10px"><div style="font-size:13px;color:#f1f3f6;font-weight:800">{{ anosYear }}</div><sc-if value="{{ anosPartial }}" hint-placeholder-val="{{ false }}"><div style="font-size:10px;color:var(--ac,#e0a93b)">parcial · 6 meses</div></sc-if></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+      <sc-for list="{{ anosKpis }}" as="k" hint-placeholder-count="6">
+        <div style="background:#11141a;border:0.5px solid #1f242d;border-radius:11px;padding:12px 11px"><div style="font-size:8.5px;letter-spacing:.06em;color:#5f646e;text-transform:uppercase">{{ k.l }}</div><div style="font-family:'Spline Sans Mono',monospace;font-size:16px;margin-top:5px;font-weight:500;color:{{ k.color }}">{{ k.v }}</div></div>
+      </sc-for>
+    </div>
+
+    <!-- monthly chart -->
+    <div style="font-size:11px;letter-spacing:.14em;color:#6a7079;font-weight:700;text-transform:uppercase;margin:22px 2px 10px">LL por mês · {{ anosYear }}</div>
+    <div style="background:#11141a;border:0.5px solid #1f242d;border-radius:14px;padding:15px">
+      <sc-for list="{{ anosMonthly }}" as="m" hint-placeholder-count="12">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:9px">
+          <div style="font-size:10px;color:#8a909a;width:26px;font-weight:600">{{ m.label }}</div>
+          <div style="flex:1;height:9px;border-radius:3px;background:#1a1f28;overflow:hidden"><div style="width:{{ m.pct }}%;height:100%;background:{{ m.color }};border-radius:3px"></div></div>
+          <div style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;color:#c2c7cf;width:52px;text-align:right">{{ m.val }}</div>
+        </div>
+      </sc-for>
+    </div>
+
+    <!-- driver leaderboard -->
+    <div style="font-size:11px;letter-spacing:.14em;color:#6a7079;font-weight:700;text-transform:uppercase;margin:22px 2px 10px">Motoristas · {{ anosYear }}</div>
+    <div style="display:flex;flex-direction:column;gap:7px">
+      <sc-for list="{{ anosDrivers }}" as="d" hint-placeholder-count="8">
+        <div style="background:#11141a;border:0.5px solid #1f242d;border-radius:12px;overflow:hidden">
+          <div onClick="{{ d.toggle }}" style="padding:12px 14px;cursor:pointer">
+            <div style="display:flex;align-items:center;gap:11px"><span style="font-family:'Spline Sans Mono',monospace;font-size:10px;color:#5f646e;width:18px">{{ d.rankFmt }}</span><span style="flex:1;font-size:14px;color:#eef0f3;font-weight:700">{{ d.name }}</span><span style="font-family:'Spline Sans Mono',monospace;font-size:14px;color:var(--ac,#e0a93b);font-weight:600">{{ d.llFmt }}</span></div>
+            <div style="height:4px;border-radius:2px;background:#1a1f28;margin-top:9px;overflow:hidden"><div style="width:{{ d.barPct }}%;height:100%;background:#2f3640;border-radius:2px"></div></div>
+            <div style="display:flex;gap:16px;margin-top:8px;padding-left:29px;align-items:center">
+              <div style="display:flex;align-items:baseline;gap:4px"><span style="font-family:'Spline Sans Mono',monospace;font-size:12px;color:#c2c7cf;font-weight:600">{{ d.v }}</span><span style="font-size:8.5px;color:#5f646e;text-transform:uppercase">viag</span></div>
+              <div style="display:flex;align-items:baseline;gap:4px"><span style="font-family:'Spline Sans Mono',monospace;font-size:12px;color:#c2c7cf;font-weight:600">{{ d.tonsFmt }}</span><span style="font-size:8.5px;color:#5f646e;text-transform:uppercase">tons</span></div>
+              <div style="display:flex;align-items:baseline;gap:4px"><span style="font-family:'Spline Sans Mono',monospace;font-size:12px;color:#c2c7cf;font-weight:600">{{ d.margemFmt }}</span><span style="font-size:8.5px;color:#5f646e;text-transform:uppercase">margem</span></div>
+              <span style="margin-left:auto;font-size:9px;color:var(--ac,#e0a93b)">mês a mês ⌄</span>
+            </div>
+          </div>
+          <sc-if value="{{ d.open }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:6px 14px 14px;background:#0d1016">
+              <div style="display:flex;align-items:flex-end;gap:4px;height:74px;padding-top:8px">
+                <sc-for list="{{ d.months }}" as="mo" hint-placeholder-count="12">
+                  <div onClick="{{ mo.onClick }}" title="{{ mo.full }}" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;cursor:{{ mo.cur }}"><div style="width:100%;border-radius:2px 2px 0 0;height:{{ mo.pct }}%;min-height:2px;background:{{ mo.color }}"></div><div style="font-size:7.5px;color:{{ mo.labelColor }};margin-top:4px">{{ mo.label }}</div></div>
+                </sc-for>
+              </div>
+              <div style="font-size:10px;color:#8a909a;margin-top:8px;text-align:center">{{ d.bestTxt }} <span style="color:#5f646e">· toca num mês ↑</span></div>
+              <sc-if value="{{ d.monthOpen }}" hint-placeholder-val="{{ false }}">
+                <div style="margin-top:12px;border-top:0.5px solid #1f242d;padding-top:11px">
+                  <div style="font-size:11px;color:#eef0f3;font-weight:700;margin-bottom:9px">{{ d.monthLabel }} <span style="color:#5f646e;font-weight:400">· viagens</span></div>
+                  <div style="display:grid;grid-template-columns:0.7fr 1fr 0.6fr 0.85fr;gap:6px;padding-bottom:7px;border-bottom:0.5px solid #1f242d"><div style="font-size:8px;letter-spacing:.06em;color:#5f646e;text-transform:uppercase">Data</div><div style="font-size:8px;letter-spacing:.06em;color:#5f646e;text-transform:uppercase">Mina</div><div style="font-size:8px;letter-spacing:.06em;color:#5f646e;text-transform:uppercase;text-align:right">Tons</div><div style="font-size:8px;letter-spacing:.06em;color:#5f646e;text-transform:uppercase;text-align:right">LL</div></div>
+                  <sc-for list="{{ d.monthTrips }}" as="t" hint-placeholder-count="6">
+                    <div style="display:grid;grid-template-columns:0.7fr 1fr 0.6fr 0.85fr;gap:6px;padding:7px 0;border-bottom:0.5px solid #14181f;align-items:center"><div style="font-family:'Spline Sans Mono',monospace;font-size:10px;color:#8a909a">{{ t.date }}</div><div style="font-size:10px;color:#a7adb6">{{ t.mina }}</div><div style="font-family:'Spline Sans Mono',monospace;font-size:10px;color:#8a909a;text-align:right">{{ t.tons }}</div><div style="font-family:'Spline Sans Mono',monospace;font-size:10.5px;color:#52c06a;text-align:right">{{ t.ll }}</div></div>
+                  </sc-for>
+                </div>
+              </sc-if>
+            </div>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ===================== VIEW: MENSAL ===================== -->
+  <sc-if value="{{ isMensal }}" hint-placeholder-val="{{ false }}">
+  <div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div style="font-size:11px;letter-spacing:.16em;color:#6a7079;font-weight:700;text-transform:uppercase">Evolução mensal</div>
+      <div style="font-family:'Spline Sans Mono',monospace;font-size:11px;color:#8a909a">Total <span style="color:#e7eaee;font-weight:600">{{ mensalTotal }}</span></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <sc-for list="{{ mensalRows }}" as="m" hint-placeholder-count="12">
+        <div style="background:#11141a;border:0.5px solid #1f242d;border-radius:12px;padding:13px 15px">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div style="display:flex;align-items:baseline;gap:9px"><div style="font-size:13px;color:#eef0f3;font-weight:700;width:34px">{{ m.label }}</div><div style="font-family:'Spline Sans Mono',monospace;font-size:16px;color:#f4f6f8;font-weight:600">{{ m.val }}</div></div>
+            <sc-if value="{{ m.up }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px;color:#52c06a;font-weight:700">▲ {{ m.delta }}</div></sc-if>
+            <sc-if value="{{ m.down }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px;color:#d65648;font-weight:700">▼ {{ m.delta }}</div></sc-if>
+          </div>
+          <div style="height:5px;border-radius:3px;background:#1a1f28;margin-top:10px;overflow:hidden"><div style="width:{{ m.pct }}%;height:100%;background:var(--ac,#e0a93b);opacity:0.7;border-radius:3px"></div></div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="font-size:10.5px;color:#5f646e;margin-top:14px;text-align:center">Variação vs mês anterior · MT</div>
+  </div>
+  </sc-if>
+
+  <!-- year selector (shared by Anos/Mensal) -->
+  <sc-if value="{{ showYearSel }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;bottom:0;left:0;right:0;z-index:30;display:flex;justify-content:center;padding:0 0 max(14px,env(safe-area-inset-bottom))">
+      <div style="display:flex;gap:4px;background:rgba(13,16,22,0.9);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:0.5px solid #242a34;border-radius:12px;padding:5px;box-shadow:0 8px 30px rgba(0,0,0,0.4)">
+        <sc-for list="{{ yearSel }}" as="y" hint-placeholder-count="5">
+          <div onClick="{{ y.select }}" style="{{ y.style }}">{{ y.year }}</div>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+
+  <div style="text-align:center;margin-top:26px;font-size:10px;color:#3f444c;letter-spacing:.04em">TRANSSAN PTY · 2022–2026 · atualizado 27/06 13:17</div>
+  </div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:430,&quot;height&quot;:920},&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#e0a93b&quot;,&quot;options&quot;:[&quot;#e0a93b&quot;,&quot;#4d8df0&quot;,&quot;#46b35e&quot;,&quot;#c77dff&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Estilo&quot;},&quot;showFuel&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Dados&quot;}}">
+class Component extends DCLogic {
+  state = { expanded:null, mineView:'volume', view:'mes', yearAnos:2026, yearMensal:2026, expandedAnos:null, expandedAnosMonth:null };
+
+  componentDidMount(){
+    if(!window.TRANSSAN_DATA){
+      this._iv = setInterval(()=>{ if(window.TRANSSAN_DATA){ clearInterval(this._iv); this.forceUpdate(); } }, 40);
+    }
+  }
+  componentWillUnmount(){ if(this._iv) clearInterval(this._iv); }
+
+  fmt(n){ return Math.round(n).toLocaleString('en-US'); }
+  fmtK(n){ return (n/1000).toFixed(0)+'k'; }
+  fmtShort(n){ return n>=1e6 ? (n/1e6).toFixed(2)+'M' : Math.round(n/1000)+'k'; }
+
+  refresh = () => this.setState({ expanded:null });
+  toggle = (name) => this.setState(s => ({ expanded: s.expanded===name ? null : name }));
+
+  buildSpark(W,H,drivers){
+    const byDay = {};
+    drivers.forEach(d => d.trips.forEach(t => { byDay[t[0]] = (byDay[t[0]]||0) + t[4]; }));
+    let cum=0; const pts=[];
+    for(let day=1; day<=27; day++){ cum += (byDay[day]||0); pts.push([day,cum]); }
+    const proj=6540000, max=proj*1.04;
+    const x=d=>((d-1)/29)*W, y=v=>H-(v/max)*(H-6)-3;
+    let line=''; pts.forEach((p,i)=>{ line += (i===0?'M':'L')+x(p[0]).toFixed(1)+' '+y(p[1]).toFixed(1)+' '; });
+    const lastX=x(27), lastY=y(cum);
+    return { line, area: line+'L'+lastX.toFixed(1)+' '+H+' L0 '+H+' Z', projPath:'M'+lastX.toFixed(1)+' '+lastY.toFixed(1)+' L'+x(30).toFixed(1)+' '+y(proj).toFixed(1), lastX:lastX.toFixed(1), lastY:lastY.toFixed(1) };
+  }
+
+  navStyle(active){
+    return 'flex:1;text-align:center;font-size:12px;font-weight:600;padding:7px 0;border-radius:8px;cursor:pointer;transition:all .15s;'
+      + (active ? 'background:var(--ac,#e0a93b);color:#0c0e12' : 'background:#11141a;border:0.5px solid #1f242d;color:#8a909a');
+  }
+
+  renderVals(){
+    const D = window.TRANSSAN_DATA || { drivers:[], monthLabels:[], years:{} };
+    const showFuel = this.props.showFuel ?? true;
+    const view = this.state.view;
+    const data = D.drivers;
+    const years = D.years;
+    const ML = D.monthLabels;
+
+    // ---- shared nav ----
+    const base = {
+      accent: this.props.accent ?? '#e0a93b',
+      dateStr:'27/06 · 13:17',
+      refresh:this.refresh,
+      navItems:[
+        {label:'Mês', go:()=>this.setState({view:'mes'}), style:this.navStyle(view==='mes')},
+        {label:'Anos', go:()=>this.setState({view:'anos'}), style:this.navStyle(view==='anos')},
+        {label:'Mensal', go:()=>this.setState({view:'mensal'}), style:this.navStyle(view==='mensal')}
+      ],
+      isMes:view==='mes', isAnos:view==='anos', isMensal:view==='mensal',
+      showYearSel: view==='anos'||view==='mensal'
+    };
+
+    // ---- MÊS ----
+    let mes = {};
+    if(data.length){
+      const maxLL = Math.max(...data.map(d=>d.net));
+      const expanded = this.state.expanded;
+      const drivers = data.map((d,i)=>{
+        const tonsSum = d.trips.reduce((a,t)=>a+t[2],0);
+        const gross = d.trips.reduce((a,t)=>a+t[4],0);
+        const fuel = d.trips.reduce((a,t)=>a+(t[3]||0),0);
+        return { name:d.name, rankFmt:'#'+(i+1), initial:d.name.charAt(0), llFmt:this.fmt(d.net), grossFmt:this.fmt(gross),
+          viagens:d.trips.length, tonsFmt:tonsSum.toFixed(0), barPct:Math.round(d.net/maxLL*100),
+          up:d.change!=null&&d.change>0, down:d.change!=null&&d.change<0, changeTxt:d.change!=null?Math.abs(d.change)+'%':'',
+          activeToday:d.active, fuelFmt:(Math.round(fuel*10)/10)+'L', showFuelChip:showFuel&&fuel!==0, open:expanded===d.name, toggle:()=>this.toggle(d.name),
+          trips:d.trips.map(t=>({ dayFmt:String(t[0]).padStart(2,'0')+'/06', mine:t[1]||'—', tons:t[2].toFixed(2), ll:this.fmt(t[4]) })) };
+      });
+      const todayTrips=[]; data.forEach(d=>d.trips.forEach(t=>{ if(t[0]===27) todayTrips.push({driver:d.name,mine:t[1],tons:t[2].toFixed(1),ll:this.fmt(t[4]),llNum:t[4],tonsNum:t[2]}); }));
+      const tll=todayTrips.reduce((a,t)=>a+t.llNum,0), ttons=todayTrips.reduce((a,t)=>a+t.tonsNum,0);
+      const ausentes=data.filter(d=>!d.active).map(d=>d.name), activeN=data.filter(d=>d.active).length;
+      const mineMap={}; data.forEach(d=>d.trips.forEach(t=>{ const m=t[1]||'—'; if(!mineMap[m])mineMap[m]={name:m,count:0,tons:0,ll:0}; mineMap[m].count++; mineMap[m].tons+=t[2]; mineMap[m].ll+=t[4]; }));
+      let arr=Object.values(mineMap); const totalV=arr.reduce((a,m)=>a+m.count,0); const mv=this.state.mineView; let mines, mineNote;
+      if(mv==='volume'){ arr.sort((a,b)=>b.count-a.count); const mc=arr[0].count; mines=arr.map(m=>({name:m.name,primary:m.count+' viag',secondary:'· '+m.tons.toFixed(0)+'t',pct:Math.round(m.count/mc*100)})); mineNote='ENERGIM e R-LINE concentram '+Math.round((mineMap['ENERGIM'].count+mineMap['R-LINE'].count)/totalV*100)+'% das viagens. Mas volume ≠ lucro — vê LL/viagem →'; }
+      else { arr.forEach(m=>m.per=m.ll/m.count); arr.sort((a,b)=>b.per-a.per); const mp=arr[0].per; mines=arr.map(m=>({name:m.name,primary:this.fmtK(m.per),secondary:'/viag · '+m.count+'v',pct:Math.round(m.per/mp*100)})); mineNote='BILA e SAFKHULA pagam mais por viagem, mas têm portagens altas. ENERGIM ganha pela escala (42 viagens).'; }
+      const tab=(on)=> on?'font-size:10px;font-weight:600;padding:5px 11px;border-radius:6px;cursor:pointer;background:var(--ac,#e0a93b);color:#0c0e12':'font-size:10px;font-weight:600;padding:5px 11px;border-radius:6px;cursor:pointer;background:transparent;color:#8a909a';
+      const sp=this.buildSpark(320,78,data);
+      const S=(window.TRANSSAN_DATA.summary)||{}; mes={ heroLL:S.heroLL, heroPrev:S.heroPrev, heroDay:S.heroDay, heroDelta:S.heroDelta, sparkArea:sp.area, sparkLine:sp.line, sparkProj:sp.projPath, dotX:sp.lastX, dotY:sp.lastY,
+        paceProj:S.paceProj, paceBarPct:S.paceBarPct, pacePct:S.pacePct,
+        kpis:S.kpis,
+        today:{ viagens:todayTrips.length, tons:ttons.toFixed(0), ll:this.fmtK(tll), delta:'+36%', mix:'4 R-LINE · 1 MAPOCHS', trips:todayTrips, activeCount:activeN, totalDrivers:data.length, ausentesNames:ausentes.slice(0,4).join(', ')+' +'+(ausentes.length-4) },
+        vs:S.vs,
+        vsProj:S.vsProj,
+        drivers, mines, mineNote, mineTabs:[
+          {label:'Volume', on:()=>this.setState({mineView:'volume'}), style:tab(mv==='volume')},
+          {label:'LL / viagem', on:()=>this.setState({mineView:'profit'}), style:tab(mv==='profit')}
+        ] };
+    }
+
+    // ---- ANOS ----
+    let anos = {};
+    const yKeys = Object.keys(years).map(Number).sort();
+    if(yKeys.length){
+      const maxYearLL = Math.max(...yKeys.map(y=>years[y].ll));
+      const ya = this.state.yearAnos;
+      anos.anosYears = yKeys.map(y=>({ year:y, llShort:this.fmtShort(years[y].ll), pct:Math.round(years[y].ll/maxYearLL*100),
+        barColor: y===ya?'var(--ac,#e0a93b)':'#2f3640', labelColor: y===ya?'#f1f3f6':'#6a7079', select:()=>this.setState({yearAnos:y}) }));
+      const Y = years[ya];
+      anos.anosYear = ya; anos.anosPartial = !!Y.partial;
+      anos.anosKpis = [
+        {l:'LL',v:this.fmtShort(Y.ll),color:'#52c06a'},{l:'Faturado',v:this.fmtShort(Y.fat),color:'#e7eaee'},{l:'Despesas',v:this.fmtShort(Y.desp),color:'#d65648'},
+        {l:'Viagens',v:String(Y.viagens),color:'#e7eaee'},{l:'Motoristas',v:String(Y.motoristas),color:'#e7eaee'},{l:'Margem',v:Y.margem.toFixed(1)+'%',color:'#e7eaee'} ];
+      const maxM = Math.max(...Y.monthly);
+      anos.anosMonthly = Y.monthly.map((v,i)=>({ label:ML[i], val:this.fmtShort(v), pct:Math.round(v/maxM*100), color: v===maxM?'var(--ac,#e0a93b)':'#3a414c' }));
+      const maxDLL = Math.max(...Y.drivers.map(d=>d.ll));
+      const expA = this.state.expandedAnos;
+      const TR = D.trips || {}; const selMK = this.state.expandedAnosMonth;
+      const MN = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+      anos.anosDrivers = Y.drivers.map((d,i)=>{
+        const mrow = (D.matrix && D.matrix[ya] && D.matrix[ya][d.name]) || [];
+        const nn = mrow.filter(v=>v!=null); const maxMo = nn.length?Math.max(...nn):1;
+        let bi=-1,bv=-1; mrow.forEach((v,j)=>{ if(v!=null&&v>bv){bv=v;bi=j;} });
+        const dTrips = (TR[d.name] && TR[d.name][String(ya)]) || {};
+        const months = mrow.map((v,j)=>{
+          const mn=j+1; const has=v!=null&&dTrips[mn]&&dTrips[mn].length; const isOpen=selMK===d.name+'|'+mn;
+          return { label:ML[j], pct:v!=null?Math.round(v/maxMo*100):0, color: isOpen?'#f4f6f8':(j===bi?'var(--ac,#e0a93b)':'#3a414c'), labelColor:isOpen?'var(--ac,#e0a93b)':'#5f646e', full:v!=null?ML[j]+': '+this.fmt(v):ML[j]+': sem viagens', cur:has?'pointer':'default',
+            onClick: has?(()=>this.setState(s=>({expandedAnosMonth: s.expandedAnosMonth===d.name+'|'+mn?null:d.name+'|'+mn}))):(()=>{}) };
+        });
+        let monthOpen=false, monthTrips=[], monthLabel='';
+        if(selMK && selMK.indexOf(d.name+'|')===0){
+          const mn=+selMK.split('|')[1]; const list=dTrips[mn]||[];
+          if(list.length){ monthOpen=true; monthLabel=MN[mn-1]+' '+ya;
+            monthTrips=list.map(t=>({ date:t[0], mina:t[1]||'—', tons:t[2]!=null?t[2].toFixed(2):'—', ll:this.fmt(t[5]) })); }
+        }
+        return { rankFmt:'#'+(i+1), name:d.name, llFmt:this.fmt(d.ll), barPct:Math.round(d.ll/maxDLL*100), v:d.v, tonsFmt:d.tons.toFixed(0), meses:d.meses+'m', margemFmt:d.margem.toFixed(0)+'%',
+          months, open:expA===d.name, toggle:()=>this.setState(s=>({expandedAnos:s.expandedAnos===d.name?null:d.name, expandedAnosMonth:null})), bestTxt: bi>=0?('Melhor mês: '+ML[bi]+' · '+this.fmtShort(bv)):'', monthOpen, monthTrips, monthLabel };
+      });
+    }
+
+    // ---- MENSAL ----
+    let mensal = {};
+    if(yKeys.length){
+      const ym = this.state.yearMensal; const Y = years[ym];
+      const maxM = Math.max(...Y.monthly);
+      mensal.mensalTotal = this.fmtShort(Y.monthly.reduce((a,b)=>a+b,0));
+      mensal.mensalRows = Y.monthly.map((v,i)=>{
+        const prev = i>0 ? Y.monthly[i-1] : null;
+        const dpct = prev ? Math.round((v-prev)/prev*100) : 0;
+        return { label:ML[i], val:this.fmt(v), pct:Math.round(v/maxM*100), up:prev!=null&&dpct>0, down:prev!=null&&dpct<0, delta:Math.abs(dpct)+'%' };
+      });
+    }
+
+    // ---- year selector (shared) ----
+    const selYear = view==='anos' ? this.state.yearAnos : this.state.yearMensal;
+    const yearSel = yKeys.map(y=>({ year:y, select:()=> view==='anos' ? this.setState({yearAnos:y}) : this.setState({yearMensal:y}),
+      style:'font-size:13px;font-weight:700;padding:7px 15px;border-radius:9px;cursor:pointer;'+(y===selYear?'background:var(--ac,#e0a93b);color:#0c0e12':'color:#8a909a') }));
+
+    return Object.assign(base, mes, anos, mensal, { yearSel });
+  }
+}
+</script>
+</body>
+</html>
