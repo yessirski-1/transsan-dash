@@ -16,7 +16,7 @@
   body{margin:0;background:#08090c;font-family:'Archivo',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
   ::-webkit-scrollbar{width:0;height:0}
 </style>
-<script src="transsan-data.js?v=1783000054"></script><script src="transsan-trips.js?v=1783000054"></script>
+<script src="transsan-data.js?v=1783000499"></script><script src="transsan-trips.js?v=1783000499"></script>
 
 </helmet>
 <template id="__bundler_thumbnail" data-bg-color="#08090c">
@@ -57,7 +57,7 @@
   <!-- ===================== VIEW: MÊS ===================== -->
   <sc-if value="{{ isMes }}" hint-placeholder-val="{{ true }}">
   <div>
-    <div style="font-size:11px;letter-spacing:.16em;color:#6a7079;font-weight:700;text-transform:uppercase;margin-bottom:8px">Lucro líquido · Junho 2026</div>
+    <div style="font-size:11px;letter-spacing:.16em;color:#6a7079;font-weight:700;text-transform:uppercase;margin-bottom:8px">Lucro líquido · {{ curMonthLabel }}</div>
     <div style="display:flex;align-items:flex-end;gap:12px">
       <div style="font-family:'Spline Sans Mono',monospace;font-size:46px;font-weight:600;color:#f4f6f8;letter-spacing:-.02em;line-height:1.12;padding-bottom:2px">{{ heroLL }}</div>
       <div style="display:flex;align-items:center;gap:5px;background:rgba(70,179,94,0.12);border:0.5px solid rgba(70,179,94,0.3);border-radius:7px;padding:4px 8px;margin-bottom:6px">
@@ -377,7 +377,7 @@ class Component extends DCLogic {
       else { arr.forEach(m=>m.per=m.ll/m.count); arr.sort((a,b)=>b.per-a.per); const mp=arr[0].per; mines=arr.map(m=>({name:m.name,primary:this.fmtK(m.per),secondary:'/viag · '+m.count+'v',pct:Math.round(m.per/mp*100)})); const topM=arr[0], byVol=[...arr].sort((a,b)=>b.count-a.count)[0]; mineNote=topM.name+' paga mais por viagem ('+this.fmtK(topM.per)+'). '+(byVol.name!==topM.name?byVol.name+' ganha pela escala ('+byVol.count+' viagens).':''); }
       const tab=(on)=> on?'font-size:10px;font-weight:600;padding:5px 11px;border-radius:6px;cursor:pointer;background:var(--ac,#e0a93b);color:#0c0e12':'font-size:10px;font-weight:600;padding:5px 11px;border-radius:6px;cursor:pointer;background:transparent;color:#8a909a';
       const sp=this.buildSpark(320,78,data);
-      const S=(window.TRANSSAN_DATA.summary)||{}; mes={ heroLL:S.heroLL, todayDM:S.todayDM, dayLabel:S.dayLabel, heroPrev:S.heroPrev, heroDay:S.heroDay, heroDelta:S.heroDelta, sparkArea:sp.area, sparkLine:sp.line, sparkProj:sp.projPath, dotX:sp.lastX, dotY:sp.lastY,
+      const S=(window.TRANSSAN_DATA.summary)||{}; mes={ heroLL:S.heroLL, todayDM:S.todayDM, curMonthLabel:S.curMonthLabel, dayLabel:S.dayLabel, heroPrev:S.heroPrev, heroDay:S.heroDay, heroDelta:S.heroDelta, sparkArea:sp.area, sparkLine:sp.line, sparkProj:sp.projPath, dotX:sp.lastX, dotY:sp.lastY,
         paceProj:S.paceProj, paceBarPct:S.paceBarPct, pacePct:S.pacePct,
         kpis:S.kpis,
         today:{ viagens:todayTrips.length, tons:ttons.toFixed(0), ll:this.fmtK(tll), delta:'+36%', mix:'4 R-LINE · 1 MAPOCHS', trips:todayTrips, activeCount:activeN, totalDrivers:data.length, ausentesNames:ausentes.slice(0,4).join(', ')+' +'+(ausentes.length-4) },
