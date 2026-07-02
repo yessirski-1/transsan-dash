@@ -16,7 +16,7 @@
   body{margin:0;background:#08090c;font-family:'Archivo',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
   ::-webkit-scrollbar{width:0;height:0}
 </style>
-<script src="transsan-data.js?v=1782999687"></script><script src="transsan-trips.js?v=1782999687"></script>
+<script src="transsan-data.js?v=1783000054"></script><script src="transsan-trips.js?v=1783000054"></script>
 
 </helmet>
 <template id="__bundler_thumbnail" data-bg-color="#08090c">
@@ -373,8 +373,8 @@ class Component extends DCLogic {
       const ausentes=data.filter(d=>!d.active).map(d=>d.name), activeN=data.filter(d=>d.active).length;
       const mineMap={}; data.forEach(d=>d.trips.forEach(t=>{ const m=t[1]||'—'; if(!mineMap[m])mineMap[m]={name:m,count:0,tons:0,ll:0}; mineMap[m].count++; mineMap[m].tons+=t[2]; mineMap[m].ll+=t[4]; }));
       let arr=Object.values(mineMap); const totalV=arr.reduce((a,m)=>a+m.count,0); const mv=this.state.mineView; let mines, mineNote;
-      if(mv==='volume'){ arr.sort((a,b)=>b.count-a.count); const mc=arr[0].count; mines=arr.map(m=>({name:m.name,primary:m.count+' viag',secondary:'· '+m.tons.toFixed(0)+'t',pct:Math.round(m.count/mc*100)})); mineNote='ENERGIM e R-LINE concentram '+Math.round((mineMap['ENERGIM'].count+mineMap['R-LINE'].count)/totalV*100)+'% das viagens. Mas volume ≠ lucro — vê LL/viagem →'; }
-      else { arr.forEach(m=>m.per=m.ll/m.count); arr.sort((a,b)=>b.per-a.per); const mp=arr[0].per; mines=arr.map(m=>({name:m.name,primary:this.fmtK(m.per),secondary:'/viag · '+m.count+'v',pct:Math.round(m.per/mp*100)})); mineNote='BILA e SAFKHULA pagam mais por viagem, mas têm portagens altas. ENERGIM ganha pela escala (42 viagens).'; }
+      if(mv==='volume'){ arr.sort((a,b)=>b.count-a.count); const mc=arr[0].count; mines=arr.map(m=>({name:m.name,primary:m.count+' viag',secondary:'· '+m.tons.toFixed(0)+'t',pct:Math.round(m.count/mc*100)})); const top2=arr.slice(0,2); mineNote=top2.map(m=>m.name).join(' e ')+' concentram '+Math.round(top2.reduce((a,m)=>a+m.count,0)/totalV*100)+'% das viagens. Mas volume ≠ lucro — vê LL/viagem →'; }
+      else { arr.forEach(m=>m.per=m.ll/m.count); arr.sort((a,b)=>b.per-a.per); const mp=arr[0].per; mines=arr.map(m=>({name:m.name,primary:this.fmtK(m.per),secondary:'/viag · '+m.count+'v',pct:Math.round(m.per/mp*100)})); const topM=arr[0], byVol=[...arr].sort((a,b)=>b.count-a.count)[0]; mineNote=topM.name+' paga mais por viagem ('+this.fmtK(topM.per)+'). '+(byVol.name!==topM.name?byVol.name+' ganha pela escala ('+byVol.count+' viagens).':''); }
       const tab=(on)=> on?'font-size:10px;font-weight:600;padding:5px 11px;border-radius:6px;cursor:pointer;background:var(--ac,#e0a93b);color:#0c0e12':'font-size:10px;font-weight:600;padding:5px 11px;border-radius:6px;cursor:pointer;background:transparent;color:#8a909a';
       const sp=this.buildSpark(320,78,data);
       const S=(window.TRANSSAN_DATA.summary)||{}; mes={ heroLL:S.heroLL, todayDM:S.todayDM, dayLabel:S.dayLabel, heroPrev:S.heroPrev, heroDay:S.heroDay, heroDelta:S.heroDelta, sparkArea:sp.area, sparkLine:sp.line, sparkProj:sp.projPath, dotX:sp.lastX, dotY:sp.lastY,
