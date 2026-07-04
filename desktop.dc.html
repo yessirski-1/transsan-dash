@@ -16,7 +16,7 @@
   body{margin:0;background:#08090c;font-family:'Archivo',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
   ::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:#23272f;border-radius:4px}
 </style>
-<script src="transsan-data.js?v=1783161948"></script><script src="transsan-trips.js?v=1783161948"></script>
+<script src="transsan-data.js?v=1783162593"></script><script src="transsan-trips.js?v=1783162593"></script>
 
 </helmet>
 <template id="__bundler_thumbnail" data-bg-color="#08090c">
@@ -95,7 +95,7 @@
         <div style="background:linear-gradient(180deg,#141821,#11141a);border:0.5px solid #242a34;border-left:3px solid var(--ac,#e0a93b);border-radius:16px;padding:20px">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
             <div style="display:flex;align-items:center;gap:9px"><div style="width:8px;height:8px;border-radius:50%;background:var(--ac,#e0a93b);box-shadow:0 0 0 3px rgba(224,169,59,0.15)"></div><div style="font-size:13px;letter-spacing:.12em;color:#f1f3f6;font-weight:800;text-transform:uppercase">Hoje · {{ todayDM }}</div></div>
-            <div style="font-size:12px;color:#52c06a;font-weight:700">▲ {{ today.delta }} vs média/dia</div>
+            <div style="font-size:12px;color:{{ today.deltaColor }};font-weight:700">{{ today.delta }} vs média/dia</div>
           </div>
           <div style="display:flex;gap:11px;margin-bottom:16px">
             <div style="flex:1;background:#0f131a;border:0.5px solid #1f242d;border-radius:12px;padding:14px 0;text-align:center"><div style="font-family:'Spline Sans Mono',monospace;font-size:27px;color:#f4f6f8;font-weight:600">{{ today.viagens }}</div><div style="font-size:9.5px;letter-spacing:.1em;color:#5f646e;margin-top:3px;text-transform:uppercase">Viagens</div></div>
@@ -335,10 +335,16 @@ class Component extends DCLogic {
           viagens:d.trips.length, tonsFmt:tonsSum.toFixed(0), barPct:Math.round(d.net/maxLL*100),
           up:d.change!=null&&d.change>0, down:d.change!=null&&d.change<0, flat:d.change==null, changeTxt:d.change!=null?Math.abs(d.change)+'%':'',
           activeToday:d.active, fuelFmt:(Math.round(fuel*10)/10)+'L', showFuelChip:showFuel&&fuel!==0, open:expanded===d.name, toggle:()=>this.toggle(d.name),
-          trips:d.trips.map(t=>({ dayFmt:String(t[0]).padStart(2,'0')+'/06', mine:t[1]||'—', tons:t[2].toFixed(2), ll:this.fmt(t[4]) })) };
+          trips:d.trips.map(t=>({ dayFmt:String(t[0]).padStart(2,'0')+'/'+(((window.TRANSSAN_DATA.summary||{}).todayDM||'/07').split('/')[1]||'07'), mine:t[1]||'—', tons:t[2].toFixed(2), ll:this.fmt(t[4]) })) };
       });
       const todayTrips=[]; data.forEach(d=>d.trips.forEach(t=>{ if(t[0]===((window.TRANSSAN_DATA.summary||{}).today||27)) todayTrips.push({driver:d.name,mine:t[1],tons:t[2].toFixed(1),ll:this.fmt(t[4]),llNum:t[4],tonsNum:t[2]}); }));
       const tll=todayTrips.reduce((a,t)=>a+t.llNum,0), ttons=todayTrips.reduce((a,t)=>a+t.tonsNum,0);
+      const _mc={}; todayTrips.forEach(t=>{_mc[t.mine||'—']=(_mc[t.mine||'—']||0)+1;});
+      const _mixStr=Object.entries(_mc).sort((a,b)=>b[1]-a[1]).map(([m,c])=>c+' '+m).join(' · ')||'—';
+      const _allT=[]; data.forEach(d=>d.trips.forEach(t=>_allT.push(t)));
+      const _mLL=_allT.reduce((a,t)=>a+t[4],0), _days=new Set(_allT.map(t=>t[0])).size, _avg=_days?_mLL/_days:0;
+      const _dp=_avg?Math.round((tll-_avg)/_avg*100):0;
+      const _deltaStr=(_dp>=0?'▲ +':'▼ ')+Math.abs(_dp)+'%', _deltaColor=_dp>=0?'#52c06a':'#e0725a';
       const ausentes=data.filter(d=>!d.active).map(d=>d.name), activeN=data.filter(d=>d.active).length;
       const mineMap={}; data.forEach(d=>d.trips.forEach(t=>{ const m=t[1]||'—'; if(!mineMap[m])mineMap[m]={name:m,count:0,tons:0,ll:0}; mineMap[m].count++; mineMap[m].tons+=t[2]; mineMap[m].ll+=t[4]; }));
       let arr=Object.values(mineMap); const totalV=arr.reduce((a,m)=>a+m.count,0); const mv=this.state.mineView; let mines,mineNote;
@@ -349,7 +355,7 @@ class Component extends DCLogic {
       const S=(window.TRANSSAN_DATA.summary)||{}; mes={ heroLL:S.heroLL, todayDM:S.todayDM, curMonthLabel:S.curMonthLabel, tracEstimateFmt:S.tracEstimateFmt, sanralBalanceFmt:S.sanralBalanceFmt, totalPortagensFmt:S.totalPortagensFmt, dayLabel:S.dayLabel, heroPrev:S.heroPrev, heroDay:S.heroDay, heroDelta:S.heroDelta, sparkAreaD:sp.area, sparkLineD:sp.line, sparkProjD:sp.projPath, dotXD:sp.lastX, dotYD:sp.lastY,
         paceProj:S.paceProj, paceBarPct:S.paceBarPct, pacePct:S.pacePct,
         kpis:S.kpis,
-        today:{ viagens:todayTrips.length, tons:ttons.toFixed(0), ll:this.fmtK(tll), delta:'+36%', trips:todayTrips, activeCount:activeN, totalDrivers:data.length, ausentesNames:ausentes.slice(0,4).join(', ')+' +'+(ausentes.length-4) },
+        today:{ viagens:todayTrips.length, tons:ttons.toFixed(0), ll:this.fmtK(tll), delta:_deltaStr, deltaColor:_deltaColor, mix:_mixStr, trips:todayTrips, activeCount:activeN, totalDrivers:data.length, ausentesNames:ausentes.slice(0,4).join(', ')+' +'+(ausentes.length-4) },
         vs:S.vs,
         vsProj:S.vsProj, drivers, mines, mineNote,
         mineTabs:[{label:'Volume',on:()=>this.setState({mineView:'volume'}),style:tab(mv==='volume')},{label:'LL / viagem',on:()=>this.setState({mineView:'profit'}),style:tab(mv==='profit')}] };
