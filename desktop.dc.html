@@ -16,7 +16,7 @@
   body{margin:0;background:#08090c;font-family:'Archivo',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
   ::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:#23272f;border-radius:4px}
 </style>
-<script src="transsan-data.js?v=1783157802"></script><script src="transsan-trips.js?v=1783157802"></script>
+<script src="transsan-data.js?v=1783158798"></script><script src="transsan-trips.js?v=1783158798"></script>
 
 </helmet>
 <template id="__bundler_thumbnail" data-bg-color="#08090c">
@@ -122,9 +122,9 @@
         <div style="background:#11141a;border:0.5px solid #1f242d;border-radius:16px;padding:20px">
           <div style="font-size:12px;letter-spacing:.12em;color:#8a909a;font-weight:700;text-transform:uppercase;margin-bottom:14px">Portagens · estimativa</div>
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px">
-            <div style="background:#0f131a;border:0.5px solid #1f242d;border-radius:12px;padding:14px"><div style="font-size:9.5px;letter-spacing:.06em;color:#5f646e;text-transform:uppercase">TRAC · MZ</div><div style="font-family:'Spline Sans Mono',monospace;font-size:19px;color:#e7eaee;margin-top:6px;font-weight:500">96k</div></div>
-            <div style="background:#0f131a;border:0.5px solid #1f242d;border-radius:12px;padding:14px"><div style="font-size:9.5px;letter-spacing:.06em;color:#5f646e;text-transform:uppercase">SANRAL · SA</div><div style="font-family:'Spline Sans Mono',monospace;font-size:19px;color:#e7eaee;margin-top:6px;font-weight:500">R24.5k</div></div>
-            <div style="background:#0f131a;border:0.5px solid #1f242d;border-radius:12px;padding:14px"><div style="font-size:9.5px;letter-spacing:.06em;color:#5f646e;text-transform:uppercase">Total/mina</div><div style="font-family:'Spline Sans Mono',monospace;font-size:19px;color:var(--ac,#e0a93b);margin-top:6px;font-weight:500">1.03M</div></div>
+            <div style="background:#0f131a;border:0.5px solid #1f242d;border-radius:12px;padding:14px"><div style="font-size:9.5px;letter-spacing:.06em;color:#5f646e;text-transform:uppercase">TRAC · MZ</div><div style="font-family:'Spline Sans Mono',monospace;font-size:19px;color:#e7eaee;margin-top:6px;font-weight:500">{{ tracEstimateFmt }}</div></div>
+            <div style="background:#0f131a;border:0.5px solid #1f242d;border-radius:12px;padding:14px"><div style="font-size:9.5px;letter-spacing:.06em;color:#5f646e;text-transform:uppercase">SANRAL · SA</div><div style="font-family:'Spline Sans Mono',monospace;font-size:19px;color:#e7eaee;margin-top:6px;font-weight:500">{{ sanralBalanceFmt }}</div></div>
+            <div style="background:#0f131a;border:0.5px solid #1f242d;border-radius:12px;padding:14px"><div style="font-size:9.5px;letter-spacing:.06em;color:#5f646e;text-transform:uppercase">Total/mina</div><div style="font-family:'Spline Sans Mono',monospace;font-size:19px;color:var(--ac,#e0a93b);margin-top:6px;font-weight:500">{{ totalPortagensFmt }}</div></div>
           </div>
         </div>
       </div>
@@ -346,7 +346,7 @@ class Component extends DCLogic {
       else { arr.forEach(m=>m.per=m.ll/m.count); arr.sort((a,b)=>b.per-a.per); const mp=arr[0].per; mines=arr.map(m=>({name:m.name,primary:this.fmtK(m.per),secondary:'/viag · '+m.count+'v',pct:Math.round(m.per/mp*100)})); const topM=arr[0], byVol=[...arr].sort((a,b)=>b.count-a.count)[0]; mineNote=topM.name+' paga mais por viagem ('+this.fmtK(topM.per)+'). '+(byVol.name!==topM.name?byVol.name+' ganha pela escala ('+byVol.count+' viagens).':''); }
       const tab=(on)=> on?'font-size:11px;font-weight:600;padding:6px 13px;border-radius:6px;cursor:pointer;background:var(--ac,#e0a93b);color:#0c0e12':'font-size:11px;font-weight:600;padding:6px 13px;border-radius:6px;cursor:pointer;background:transparent;color:#8a909a';
       const sp=this.buildSpark(560,150,data);
-      const S=(window.TRANSSAN_DATA.summary)||{}; mes={ heroLL:S.heroLL, todayDM:S.todayDM, curMonthLabel:S.curMonthLabel, dayLabel:S.dayLabel, heroPrev:S.heroPrev, heroDay:S.heroDay, heroDelta:S.heroDelta, sparkAreaD:sp.area, sparkLineD:sp.line, sparkProjD:sp.projPath, dotXD:sp.lastX, dotYD:sp.lastY,
+      const S=(window.TRANSSAN_DATA.summary)||{}; mes={ heroLL:S.heroLL, todayDM:S.todayDM, curMonthLabel:S.curMonthLabel, tracEstimateFmt:S.tracEstimateFmt, sanralBalanceFmt:S.sanralBalanceFmt, totalPortagensFmt:S.totalPortagensFmt, dayLabel:S.dayLabel, heroPrev:S.heroPrev, heroDay:S.heroDay, heroDelta:S.heroDelta, sparkAreaD:sp.area, sparkLineD:sp.line, sparkProjD:sp.projPath, dotXD:sp.lastX, dotYD:sp.lastY,
         paceProj:S.paceProj, paceBarPct:S.paceBarPct, pacePct:S.pacePct,
         kpis:S.kpis,
         today:{ viagens:todayTrips.length, tons:ttons.toFixed(0), ll:this.fmtK(tll), delta:'+36%', trips:todayTrips, activeCount:activeN, totalDrivers:data.length, ausentesNames:ausentes.slice(0,4).join(', ')+' +'+(ausentes.length-4) },

@@ -16,7 +16,7 @@
   body{margin:0;background:#08090c;font-family:'Archivo',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
   ::-webkit-scrollbar{width:0;height:0}
 </style>
-<script src="transsan-data.js?v=1783157802"></script><script src="transsan-trips.js?v=1783157802"></script>
+<script src="transsan-data.js?v=1783158798"></script><script src="transsan-trips.js?v=1783158798"></script>
 
 </helmet>
 <template id="__bundler_thumbnail" data-bg-color="#08090c">
@@ -175,8 +175,8 @@
 
     <div style="font-size:11px;letter-spacing:.14em;color:#6a7079;font-weight:700;text-transform:uppercase;margin:24px 2px 10px">Portagens · estimativa</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-      <div style="background:#11141a;border:0.5px solid #1f242d;border-radius:12px;padding:13px"><div style="font-size:9px;letter-spacing:.08em;color:#5f646e;text-transform:uppercase">TRAC · MZ</div><div style="font-family:'Spline Sans Mono',monospace;font-size:18px;color:#e7eaee;margin-top:5px;font-weight:500">96k <span style="font-size:10px;color:#6a7079">MT</span></div><div style="font-size:9.5px;color:#5f646e;margin-top:3px">Conta 295963 · statement 06/09</div></div>
-      <div style="background:#11141a;border:0.5px solid #1f242d;border-radius:12px;padding:13px"><div style="font-size:9px;letter-spacing:.08em;color:#5f646e;text-transform:uppercase">SANRAL · SA</div><div style="font-family:'Spline Sans Mono',monospace;font-size:18px;color:#e7eaee;margin-top:5px;font-weight:500">R24,558</div><div style="font-size:9.5px;color:#5f646e;margin-top:3px">Conta 1479869 · 18 tags</div></div>
+      <div style="background:#11141a;border:0.5px solid #1f242d;border-radius:12px;padding:13px"><div style="font-size:9px;letter-spacing:.08em;color:#5f646e;text-transform:uppercase">TRAC · MZ</div><div style="font-family:'Spline Sans Mono',monospace;font-size:18px;color:#e7eaee;margin-top:5px;font-weight:500">{{ tracEstimateFmt }} <span style="font-size:10px;color:#6a7079">MT</span></div><div style="font-size:9.5px;color:#5f646e;margin-top:3px">Conta 295963 · statement 06/09</div></div>
+      <div style="background:#11141a;border:0.5px solid #1f242d;border-radius:12px;padding:13px"><div style="font-size:9px;letter-spacing:.08em;color:#5f646e;text-transform:uppercase">SANRAL · SA</div><div style="font-family:'Spline Sans Mono',monospace;font-size:18px;color:#e7eaee;margin-top:5px;font-weight:500">{{ sanralBalanceFmt }}</div><div style="font-size:9.5px;color:#5f646e;margin-top:3px">Conta 1479869 · 18 tags</div></div>
     </div>
     <div style="background:#11141a;border:0.5px solid #1f242d;border-radius:12px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between"><div style="font-size:11px;color:#8a909a">Total estimado por mina</div><div style="font-family:'Spline Sans Mono',monospace;font-size:15px;color:#e7eaee;font-weight:600">1.03M <span style="font-size:10px;color:#6a7079">MT</span></div></div>
   </div>
@@ -377,7 +377,7 @@ class Component extends DCLogic {
       else { arr.forEach(m=>m.per=m.ll/m.count); arr.sort((a,b)=>b.per-a.per); const mp=arr[0].per; mines=arr.map(m=>({name:m.name,primary:this.fmtK(m.per),secondary:'/viag · '+m.count+'v',pct:Math.round(m.per/mp*100)})); const topM=arr[0], byVol=[...arr].sort((a,b)=>b.count-a.count)[0]; mineNote=topM.name+' paga mais por viagem ('+this.fmtK(topM.per)+'). '+(byVol.name!==topM.name?byVol.name+' ganha pela escala ('+byVol.count+' viagens).':''); }
       const tab=(on)=> on?'font-size:10px;font-weight:600;padding:5px 11px;border-radius:6px;cursor:pointer;background:var(--ac,#e0a93b);color:#0c0e12':'font-size:10px;font-weight:600;padding:5px 11px;border-radius:6px;cursor:pointer;background:transparent;color:#8a909a';
       const sp=this.buildSpark(320,78,data);
-      const S=(window.TRANSSAN_DATA.summary)||{}; mes={ heroLL:S.heroLL, todayDM:S.todayDM, curMonthLabel:S.curMonthLabel, dayLabel:S.dayLabel, heroPrev:S.heroPrev, heroDay:S.heroDay, heroDelta:S.heroDelta, sparkArea:sp.area, sparkLine:sp.line, sparkProj:sp.projPath, dotX:sp.lastX, dotY:sp.lastY,
+      const S=(window.TRANSSAN_DATA.summary)||{}; mes={ heroLL:S.heroLL, todayDM:S.todayDM, curMonthLabel:S.curMonthLabel, tracEstimateFmt:S.tracEstimateFmt, sanralBalanceFmt:S.sanralBalanceFmt, totalPortagensFmt:S.totalPortagensFmt, dayLabel:S.dayLabel, heroPrev:S.heroPrev, heroDay:S.heroDay, heroDelta:S.heroDelta, sparkArea:sp.area, sparkLine:sp.line, sparkProj:sp.projPath, dotX:sp.lastX, dotY:sp.lastY,
         paceProj:S.paceProj, paceBarPct:S.paceBarPct, pacePct:S.pacePct,
         kpis:S.kpis,
         today:{ viagens:todayTrips.length, tons:ttons.toFixed(0), ll:this.fmtK(tll), delta:'+36%', mix:'4 R-LINE · 1 MAPOCHS', trips:todayTrips, activeCount:activeN, totalDrivers:data.length, ausentesNames:ausentes.slice(0,4).join(', ')+' +'+(ausentes.length-4) },
