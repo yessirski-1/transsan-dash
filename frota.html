@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TRANSSAN — Frota</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="frota-data.js?v=1784981277"></script>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#08090c;color:#f4f6f8;font-family:'Archivo',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1100px;margin:0 auto;padding:0 20px 60px;background:radial-gradient(100% 40% at 50% 0%,#10131a 0%,rgba(8,9,12,0) 60%)}
+  .hdr{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:14px;padding:16px 4px 14px;background:rgba(8,9,12,.85);backdrop-filter:blur(16px);border-bottom:.5px solid #1c2029}
+  .logo{background:#fff;border-radius:7px;padding:5px 9px;display:flex;align-items:center}
+  .logo img{height:20px;display:block}
+  .tag{color:#6a7079;font-size:11px;font-weight:700;letter-spacing:.08em}
+  .back{margin-left:auto;color:#9aa1ab;font-size:12px;font-weight:600;text-decoration:none;padding:7px 12px;border:1px solid #23272f;border-radius:8px}
+  .back:active,.back:hover{color:#f4f6f8;border-color:#3a404b}
+  h1{font-size:22px;font-weight:800;letter-spacing:.02em;margin:26px 0 4px}
+  .sub{color:#6a7079;font-size:12.5px;margin:0 0 22px}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:26px}
+  .card{background:#0e1116;border:1px solid #1c2029;border-radius:12px;padding:14px 16px}
+  .card .k{color:#6a7079;font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase}
+  .card .v{font-family:'Spline Sans Mono',monospace;font-size:20px;font-weight:600;margin-top:5px}
+  .card .v small{font-size:12px;color:#9aa1ab}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  thead th{color:#6a7079;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;text-align:right;padding:8px 10px;border-bottom:1px solid #1c2029;white-space:nowrap}
+  thead th:first-child,thead th:nth-child(2){text-align:left}
+  tbody td{padding:10px;border-bottom:.5px solid #14171d;text-align:right;font-family:'Spline Sans Mono',monospace;white-space:nowrap}
+  tbody td:first-child{font-weight:600;text-align:left;font-family:'Archivo',sans-serif}
+  tbody td:nth-child(2){text-align:left;color:#9aa1ab;font-family:'Archivo',sans-serif;font-size:12px}
+  tbody tr:active,tbody tr:hover{background:#0e1116}
+  .gold{color:#e0a93b}
+  .spark{display:flex;align-items:flex-end;gap:2px;height:26px;justify-content:flex-end}
+  .spark i{display:block;width:7px;background:#2a3140;border-radius:2px 2px 0 0;min-height:2px}
+  .spark i.cur{background:#e0a93b}
+  .ast{color:#6a7079;font-size:10px}
+  .note{color:#4d535c;font-size:11px;margin-top:18px;line-height:1.6}
+  @media(max-width:640px){
+    .hidem{display:none}
+    thead th,tbody td{padding:8px 6px;font-size:12px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hdr">
+    <div class="logo"><img src="transsan-logo.png" alt="TRANSSAN"></div>
+    <span class="tag">FROTA</span>
+    <a class="back" href="index.html">← Dashboard</a>
+  </div>
+
+  <h1>Frota — viagens por camião</h1>
+  <p class="sub" id="sub"></p>
+
+  <div class="cards" id="cards"></div>
+
+  <table>
+    <thead><tr>
+      <th>Camião</th><th>Motorista</th>
+      <th class="hidem">Meses</th>
+      <th>Mês: viagens</th><th class="hidem">Mês: LL</th>
+      <th>Ano: viagens</th><th>Ano: LL</th>
+    </tr></thead>
+    <tbody id="rows"></tbody>
+  </table>
+
+  <p class="note" id="note"></p>
+</div>
+<script>
+(function(){
+  var D = window.FROTA_DATA || {camioes:[],resumo:{}};
+  var R = D.resumo, C = D.camioes;
+  var fmt = function(n){ return (n||0).toLocaleString('pt-PT'); };
+  var MES = {'01':'Janeiro','02':'Fevereiro','03':'Março','04':'Abril','05':'Maio','06':'Junho','07':'Julho','08':'Agosto','09':'Setembro','10':'Outubro','11':'Novembro','12':'Dezembro'};
+  var curNome = R.mes_corrente ? MES[R.mes_corrente.slice(5)] : '';
+  document.getElementById('sub').textContent = (R.meses||[]).length + ' meses de ' + (R.mes_corrente||'').slice(0,4) + ' · atualizado ' + (R.gerado||'');
+
+  var media = R.n_camioes ? (R.viagens_cur / R.n_camioes) : 0;
+  var cards = [
+    ['Camiões', fmt(R.n_camioes)],
+    [curNome + ' · viagens', fmt(R.viagens_cur)],
+    [curNome + ' · LL', fmt(R.ll_cur) + ' <small>MT</small>'],
+    ['Média viagens/camião', media.toFixed(1)],
+    ['Ano · LL', fmt(R.ll_ano) + ' <small>MT</small>']
+  ];
+  document.getElementById('cards').innerHTML = cards.map(function(c){
+    return '<div class="card"><div class="k">'+c[0]+'</div><div class="v">'+c[1]+'</div></div>';
+  }).join('');
+
+  var maxV = 1;
+  C.forEach(function(c){ c.viagens_mes.forEach(function(v){ if(v>maxV) maxV=v; }); });
+  document.getElementById('rows').innerHTML = C.map(function(c){
+    var spark = '<div class="spark">' + c.viagens_mes.map(function(v,i){
+      var h = Math.max(2, Math.round(v/maxV*26));
+      var cls = (i===c.viagens_mes.length-1) ? ' class="cur"' : '';
+      return '<i'+cls+' style="height:'+h+'px" title="'+v+'"></i>';
+    }).join('') + '</div>';
+    var ast = c.presumidas ? ' <span class="ast">*'+c.presumidas+'</span>' : '';
+    return '<tr><td>'+c.matricula+ast+'</td><td>'+c.motorista+'</td>'+
+      '<td class="hidem">'+spark+'</td>'+
+      '<td>'+c.viagens_cur+'</td>'+
+      '<td class="hidem">'+fmt(c.ll_cur)+'</td>'+
+      '<td>'+c.viagens_total+'</td>'+
+      '<td class="gold">'+fmt(c.ll_total)+'</td></tr>';
+  }).join('');
+
+  document.getElementById('note').textContent = '* viagens com camião presumido pelo habitual do motorista (dias não registados no tipper: ' + fmt(R.presumidas) + ' de ' + fmt(R.viagens_ano) + '). LL em MT. Barras = viagens por mês (dourada = mês corrente).';
+})();
+</script>
+</body>
+</html>
