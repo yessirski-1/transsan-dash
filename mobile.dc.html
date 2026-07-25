@@ -16,7 +16,7 @@
   body{margin:0;background:#08090c;font-family:'Archivo',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
   ::-webkit-scrollbar{width:0;height:0}
 </style>
-<script src="transsan-data.js?v=1784981566"></script><script src="transsan-trips.js?v=1784981566"></script>
+<script src="transsan-data.js?v=1784981823"></script><script src="transsan-trips.js?v=1784981823"></script><script src="frota-data.js?v=1784981823"></script>
 
 </helmet>
 <template id="__bundler_thumbnail" data-bg-color="#08090c">
@@ -291,6 +291,35 @@
     </div>
   </sc-if>
 
+  <!-- ===================== FROTA ===================== -->
+  <sc-if value="{{ isFrota }}" hint-placeholder-val="{{ false }}">
+  <div style="padding-top:18px">
+    <div style="font-size:11px;letter-spacing:.14em;color:#6a7079;font-weight:700;text-transform:uppercase;margin-bottom:12px">Frota · viagens por camião</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:14px">
+      <sc-for list="{{ frotaKpis }}" as="k" hint-placeholder-count="4">
+        <div style="background:#11141a;border:0.5px solid #1f242d;border-radius:12px;padding:12px 13px"><div style="font-size:8.5px;letter-spacing:.06em;color:#5f646e;text-transform:uppercase">{{ k.l }}</div><div style="font-family:'Spline Sans Mono',monospace;font-size:16px;margin-top:5px;font-weight:500;color:#e7eaee">{{ k.v }}</div></div>
+      </sc-for>
+    </div>
+    <sc-for list="{{ frotaRows }}" as="c" hint-placeholder-count="15">
+      <div style="background:#11141a;border:0.5px solid #1f242d;border-radius:13px;padding:13px 14px;margin-bottom:9px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div style="display:flex;align-items:baseline;gap:7px"><span style="font-family:'Spline Sans Mono',monospace;font-size:9px;color:#5f646e">{{ c.rankFmt }}</span><span style="font-size:14px;color:#eef0f3;font-weight:700">{{ c.matricula }}</span><span style="font-size:9px;color:#5f646e">{{ c.ast }}</span></div>
+          <div style="font-size:11px;color:#8a909a">{{ c.motorista }}</div>
+        </div>
+        <div style="display:flex;align-items:flex-end;gap:3px;height:22px;margin-bottom:9px">
+          <sc-for list="{{ c.bars }}" as="b" hint-placeholder-count="7"><div style="flex:1;max-width:14px;height:{{ b.pct }}%;min-height:2px;background:{{ b.color }};border-radius:2px 2px 0 0"></div></sc-for>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-family:'Spline Sans Mono',monospace;font-size:11px">
+          <div style="color:#a7adb6">mês <span style="color:#e7eaee">{{ c.vCur }}v</span> · <span style="color:#c2c7cf">{{ c.llCurFmt }}</span></div>
+          <div style="color:#a7adb6">ano <span style="color:#e7eaee">{{ c.vTot }}v</span> · <span style="color:var(--ac,#e0a93b);font-weight:600">{{ c.llTotFmt }}</span></div>
+        </div>
+      </div>
+    </sc-for>
+    <div style="font-size:10.5px;color:#5f646e;margin-top:10px;line-height:1.5">{{ frotaNote }}</div>
+  </div>
+  </sc-if>
+
+
   <div style="text-align:center;margin-top:26px;font-size:10px;color:#3f444c;letter-spacing:.04em">TRANSSAN PTY · 2022–2026 · atualizado {{ dateStr }}</div>
   </div>
 </div>
@@ -347,11 +376,35 @@ class Component extends DCLogic {
       navItems:[
         {label:'Mês', go:()=>this.setState({view:'mes'}), style:this.navStyle(view==='mes')},
         {label:'Anos', go:()=>this.setState({view:'anos'}), style:this.navStyle(view==='anos')},
-        {label:'Mensal', go:()=>this.setState({view:'mensal'}), style:this.navStyle(view==='mensal')}
+        {label:'Mensal', go:()=>this.setState({view:'mensal'}), style:this.navStyle(view==='mensal')},
+        {label:'Frota', go:()=>this.setState({view:'frota'}), style:this.navStyle(view==='frota')}
       ],
-      isMes:view==='mes', isAnos:view==='anos', isMensal:view==='mensal',
+      isMes:view==='mes', isAnos:view==='anos', isMensal:view==='mensal', isFrota:view==='frota',
       showYearSel: view==='anos'||view==='mensal'
     };
+
+    // ===== FROTA (frota-data.js) =====
+    {
+      const F = window.FROTA_DATA || { camioes:[], resumo:{} };
+      const R = F.resumo || {}, C = F.camioes || [];
+      const MESN = {'01':'Janeiro','02':'Fevereiro','03':'Março','04':'Abril','05':'Maio','06':'Junho','07':'Julho','08':'Agosto','09':'Setembro','10':'Outubro','11':'Novembro','12':'Dezembro'};
+      const curNome = R.mes_corrente ? MESN[R.mes_corrente.slice(5)] : '';
+      base.frotaKpis = [
+        {l:'Camiões', v:String(R.n_camioes||0)},
+        {l:curNome+' · viagens', v:this.fmt(R.viagens_cur||0)},
+        {l:curNome+' · LL viagens', v:this.fmt(R.ll_cur||0)},
+        {l:'Ano · LL viagens', v:this.fmt(R.ll_ano||0)}
+      ];
+      const maxV = Math.max(1, ...C.map(c=>Math.max(...c.viagens_mes)));
+      base.frotaRows = C.map((c,i)=>({
+        rankFmt:'#'+(i+1), matricula:c.matricula, motorista:(c.motorista||'?'),
+        ast:c.presumidas ? '*'+c.presumidas : '',
+        bars:c.viagens_mes.map((v,j)=>({ pct:Math.max(6,Math.round(v/maxV*100)), color:(j===c.viagens_mes.length-1)?'var(--ac,#e0a93b)':'#2a3140', tip:String(v) })),
+        vCur:String(c.viagens_cur), llCurFmt:this.fmt(c.ll_cur),
+        vTot:String(c.viagens_total), llTotFmt:this.fmt(c.ll_total)
+      }));
+      base.frotaNote = 'LL das viagens, antes de salários (o Lucro Líquido do topo desconta 12.000/motorista·mês). * = camião presumido pelo habitual ('+(R.presumidas||0)+' de '+(R.viagens_ano||0)+' no ano).';
+    }
 
     // ---- MÊS ----
     let mes = {};

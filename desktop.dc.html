@@ -16,7 +16,7 @@
   body{margin:0;background:#08090c;font-family:'Archivo',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
   ::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:#23272f;border-radius:4px}
 </style>
-<script src="transsan-data.js?v=1784981566"></script><script src="transsan-trips.js?v=1784981566"></script>
+<script src="transsan-data.js?v=1784981823"></script><script src="transsan-trips.js?v=1784981823"></script><script src="frota-data.js?v=1784981823"></script>
 
 </helmet>
 <template id="__bundler_thumbnail" data-bg-color="#08090c">
@@ -272,6 +272,39 @@
   </div>
   </sc-if>
 
+  <!-- ===================== FROTA ===================== -->
+  <sc-if value="{{ isFrota }}" hint-placeholder-val="{{ false }}">
+  <div style="padding-top:24px">
+    <div style="font-size:12px;letter-spacing:.14em;color:#6a7079;font-weight:700;text-transform:uppercase;margin-bottom:14px">Frota · viagens por camião</div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:11px;margin-bottom:18px">
+      <sc-for list="{{ frotaKpis }}" as="k" hint-placeholder-count="5">
+        <div style="background:#11141a;border:0.5px solid #1f242d;border-radius:12px;padding:14px 15px"><div style="font-size:9px;letter-spacing:.06em;color:#5f646e;text-transform:uppercase">{{ k.l }}</div><div style="font-family:'Spline Sans Mono',monospace;font-size:19px;margin-top:6px;font-weight:500;color:{{ k.color }}">{{ k.v }}</div></div>
+      </sc-for>
+    </div>
+    <div style="background:#11141a;border:0.5px solid #1f242d;border-radius:16px;padding:20px">
+      <div style="display:grid;grid-template-columns:0.5fr 1.3fr 1.3fr 1.6fr 0.8fr 1fr 0.8fr 1.1fr;gap:8px;padding-bottom:9px;border-bottom:0.5px solid #1f242d">
+        <div style="font-size:9px;color:#5f646e;text-transform:uppercase">#</div><div style="font-size:9px;color:#5f646e;text-transform:uppercase">Camião</div><div style="font-size:9px;color:#5f646e;text-transform:uppercase">Motorista</div><div style="font-size:9px;color:#5f646e;text-transform:uppercase">Meses</div><div style="font-size:9px;color:#5f646e;text-transform:uppercase;text-align:right">Mês·V</div><div style="font-size:9px;color:#5f646e;text-transform:uppercase;text-align:right">Mês·LL</div><div style="font-size:9px;color:#5f646e;text-transform:uppercase;text-align:right">Ano·V</div><div style="font-size:9px;color:#5f646e;text-transform:uppercase;text-align:right">Ano·LL</div>
+      </div>
+      <sc-for list="{{ frotaRows }}" as="c" hint-placeholder-count="15">
+        <div style="display:grid;grid-template-columns:0.5fr 1.3fr 1.3fr 1.6fr 0.8fr 1fr 0.8fr 1.1fr;gap:8px;padding:10px 0;border-bottom:0.5px solid #161a21;align-items:center">
+          <div style="font-family:'Spline Sans Mono',monospace;font-size:10px;color:#5f646e">{{ c.rankFmt }}</div>
+          <div style="font-size:13px;color:#eef0f3;font-weight:600">{{ c.matricula }} <span style="font-size:9px;color:#5f646e">{{ c.ast }}</span></div>
+          <div style="font-size:12px;color:#a7adb6">{{ c.motorista }}</div>
+          <div style="display:flex;align-items:flex-end;gap:3px;height:26px">
+            <sc-for list="{{ c.bars }}" as="b" hint-placeholder-count="7"><div title="{{ b.tip }}" style="flex:1;max-width:11px;height:{{ b.pct }}%;min-height:2px;background:{{ b.color }};border-radius:2px 2px 0 0"></div></sc-for>
+          </div>
+          <div style="font-family:'Spline Sans Mono',monospace;font-size:11px;color:#a7adb6;text-align:right">{{ c.vCur }}</div>
+          <div style="font-family:'Spline Sans Mono',monospace;font-size:11px;color:#c2c7cf;text-align:right">{{ c.llCurFmt }}</div>
+          <div style="font-family:'Spline Sans Mono',monospace;font-size:11px;color:#a7adb6;text-align:right">{{ c.vTot }}</div>
+          <div style="font-family:'Spline Sans Mono',monospace;font-size:12px;color:var(--ac,#e0a93b);text-align:right;font-weight:600">{{ c.llTotFmt }}</div>
+        </div>
+      </sc-for>
+      <div style="font-size:11px;color:#5f646e;margin-top:14px">{{ frotaNote }}</div>
+    </div>
+  </div>
+  </sc-if>
+
+
   <div style="text-align:center;margin-top:32px;font-size:11px;color:#3f444c;letter-spacing:.04em">TRANSSAN PTY · 2022–2026 · atualizado {{ dateStr }}</div>
 
 </div>
@@ -321,10 +354,38 @@ class Component extends DCLogic {
       navItems:[
         {label:'Mês', go:()=>this.setState({view:'mes'}), style:this.navStyle(view==='mes')},
         {label:'Anos', go:()=>this.setState({view:'anos'}), style:this.navStyle(view==='anos')},
-        {label:'Mensal', go:()=>this.setState({view:'mensal'}), style:this.navStyle(view==='mensal')}
+        {label:'Mensal', go:()=>this.setState({view:'mensal'}), style:this.navStyle(view==='mensal')},
+        {label:'Frota', go:()=>this.setState({view:'frota'}), style:this.navStyle(view==='frota')}
       ],
-      isMes:view==='mes', isAnos:view==='anos', isMensal:view==='mensal'
+      isMes:view==='mes', isAnos:view==='anos', isMensal:view==='mensal', isFrota:view==='frota'
     };
+
+    // ===== FROTA (frota-data.js) =====
+    {
+      const F = window.FROTA_DATA || { camioes:[], resumo:{} };
+      const R = F.resumo || {}, C = F.camioes || [];
+      const media = R.n_camioes ? (R.viagens_cur / R.n_camioes) : 0;
+      const MESN = {'01':'Janeiro','02':'Fevereiro','03':'Março','04':'Abril','05':'Maio','06':'Junho','07':'Julho','08':'Agosto','09':'Setembro','10':'Outubro','11':'Novembro','12':'Dezembro'};
+      const curNome = R.mes_corrente ? MESN[R.mes_corrente.slice(5)] : '';
+      base.frotaKpis = [
+        {l:'Camiões', v:String(R.n_camioes||0), color:'#e7eaee'},
+        {l:curNome+' · viagens', v:this.fmt(R.viagens_cur||0), color:'#e7eaee'},
+        {l:curNome+' · LL viagens', v:this.fmt(R.ll_cur||0), color:'var(--ac,#e0a93b)'},
+        {l:'Média viagens/camião', v:media.toFixed(1), color:'#e7eaee'},
+        {l:'Ano · LL viagens', v:this.fmt(R.ll_ano||0), color:'var(--ac,#e0a93b)'}
+      ];
+      const maxV = Math.max(1, ...C.map(c=>Math.max(...c.viagens_mes)));
+      const maxAno = Math.max(1, ...C.map(c=>c.ll_total));
+      base.frotaRows = C.map((c,i)=>({
+        rankFmt:'#'+(i+1), matricula:c.matricula, motorista:(c.motorista||'?'),
+        ast:c.presumidas ? '*'+c.presumidas : '',
+        bars:c.viagens_mes.map((v,j)=>({ pct:Math.max(6,Math.round(v/maxV*100)), color:(j===c.viagens_mes.length-1)?'var(--ac,#e0a93b)':'#2a3140', tip:String(v) })),
+        vCur:String(c.viagens_cur), llCurFmt:this.fmt(c.ll_cur),
+        vTot:String(c.viagens_total), llTotFmt:this.fmt(c.ll_total),
+        barPct:Math.round(c.ll_total/maxAno*100)
+      }));
+      base.frotaNote = 'LL das viagens, antes de salários (o Lucro Líquido do topo desconta 12.000/motorista·mês). * = viagens com camião presumido pelo habitual do motorista ('+(R.presumidas||0)+' de '+(R.viagens_ano||0)+' no ano).';
+    }
 
     let mes={};
     if(data.length){
