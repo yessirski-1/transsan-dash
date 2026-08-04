@@ -16,7 +16,7 @@
   body{margin:0;background:#08090c;font-family:'Archivo',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
   ::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:#23272f;border-radius:4px}
 </style>
-<script src="transsan-data.js?v=1785873536"></script><script src="transsan-trips.js?v=1785873536"></script><script src="frota-data.js?v=1785873536"></script>
+<script src="transsan-data.js?v=1785873769"></script><script src="transsan-trips.js?v=1785873769"></script><script src="frota-data.js?v=1785873769"></script>
 
 </helmet>
 <template id="__bundler_thumbnail" data-bg-color="#08090c">
@@ -71,7 +71,7 @@
       <div>
         <svg viewBox="0 0 560 150" preserveAspectRatio="none" style="width:100%;height:150px;display:block">
           <defs><linearGradient id="ag" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#e0a93b" stop-opacity="0.26"/><stop offset="100%" stop-color="#e0a93b" stop-opacity="0"/></linearGradient></defs>
-          <path d="{{ sparkAreaD }}" fill="url(#ag)"></path>
+          <path d="{{ sparkGhostD }}" fill="none" stroke="#343b47" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path><path d="{{ sparkAreaD }}" fill="url(#ag)"></path>
           <path d="{{ sparkProjD }}" fill="none" stroke="#3a3f49" stroke-width="1.6" stroke-dasharray="4,4" stroke-linecap="round"></path>
           <path d="{{ sparkLineD }}" fill="none" style="stroke:var(--ac,#e0a93b)" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"></path>
           <circle cx="{{ dotXD }}" cy="{{ dotYD }}" r="7" fill="#e0a93b" opacity="0.18"></circle>
@@ -331,11 +331,12 @@ class Component extends DCLogic {
   buildSpark(W,H,drivers){
     const byDay={}; drivers.forEach(d=>d.trips.forEach(t=>{ byDay[t[0]]=(byDay[t[0]]||0)+t[4]; }));
     let cum=0; const pts=[]; for(let day=1;day<=((window.TRANSSAN_DATA.summary||{}).today||27);day++){ cum+=(byDay[day]||0); pts.push([day,cum]); }
-    const _t=((window.TRANSSAN_DATA.summary||{}).today||27), _dim=((window.TRANSSAN_DATA.summary||{}).daysInMonth||30); const proj=_t?cum/_t*_dim:cum, max=Math.max(cum,proj)*1.08||1;
+    const _t=((window.TRANSSAN_DATA.summary||{}).today||27), _dim=((window.TRANSSAN_DATA.summary||{}).daysInMonth||30); const proj=_t?cum/_t*_dim:cum, max=Math.max(cum,proj,(((window.TRANSSAN_DATA.summary||{}).prevDaily)||[]).slice(-1)[0]||0)*1.08||1;
     const x=d=>((d-1)/(_dim-1))*W, y=v=>H-(v/max)*(H-8)-4;
     let line=''; pts.forEach((p,i)=>{ line+=(i===0?'M':'L')+x(p[0]).toFixed(1)+' '+y(p[1]).toFixed(1)+' '; });
+    const PD=((window.TRANSSAN_DATA.summary||{}).prevDaily)||[]; const gx=d=>((d-1)/Math.max(PD.length-1,1))*W; let ghost=''; PD.forEach((v,i)=>{ ghost+=(i===0?'M':'L')+gx(i+1).toFixed(1)+' '+y(v).toFixed(1)+' '; });
     const lastX=x(_t), lastY=y(cum);
-    return { line, area:line+'L'+lastX.toFixed(1)+' '+H+' L0 '+H+' Z', projPath:'M'+lastX.toFixed(1)+' '+lastY.toFixed(1)+' L'+x(((window.TRANSSAN_DATA.summary||{}).daysInMonth||30)).toFixed(1)+' '+y(proj).toFixed(1), lastX:lastX.toFixed(1), lastY:lastY.toFixed(1) };
+    return { ghost, line, area:line+'L'+lastX.toFixed(1)+' '+H+' L0 '+H+' Z', projPath:'M'+lastX.toFixed(1)+' '+lastY.toFixed(1)+' L'+x(((window.TRANSSAN_DATA.summary||{}).daysInMonth||30)).toFixed(1)+' '+y(proj).toFixed(1), lastX:lastX.toFixed(1), lastY:lastY.toFixed(1) };
   }
 
   navStyle(active){
@@ -413,7 +414,7 @@ class Component extends DCLogic {
       else { arr.forEach(m=>m.per=m.ll/m.count); arr.sort((a,b)=>b.per-a.per); const mp=arr[0].per; mines=arr.map(m=>({name:m.name,primary:this.fmtK(m.per),secondary:'/viag · '+m.count+'v',pct:Math.round(m.per/mp*100)})); const topM=arr[0], byVol=[...arr].sort((a,b)=>b.count-a.count)[0]; mineNote=topM.name+' paga mais por viagem ('+this.fmtK(topM.per)+'). '+(byVol.name!==topM.name?byVol.name+' ganha pela escala ('+byVol.count+' viagens).':''); }
       const tab=(on)=> on?'font-size:11px;font-weight:600;padding:6px 13px;border-radius:6px;cursor:pointer;background:var(--ac,#e0a93b);color:#0c0e12':'font-size:11px;font-weight:600;padding:6px 13px;border-radius:6px;cursor:pointer;background:transparent;color:#8a909a';
       const sp=this.buildSpark(560,150,data);
-      const S=(window.TRANSSAN_DATA.summary)||{}; mes={ heroLL:S.heroLL, todayDM:S.todayDM, curMonthLabel:S.curMonthLabel, tracEstimateFmt:S.tracEstimateFmt, sanralBalanceFmt:S.sanralBalanceFmt, totalPortagensFmt:S.totalPortagensFmt, dayLabel:S.dayLabel, heroPrev:S.heroPrev, heroDay:S.heroDay, heroDelta:S.heroDelta, prevMonthLabel:S.prevMonthLabel, vsBadge:S.vsBadge, vsBadgeColor:S.vsBadgeColor, heroArrow:S.heroArrow, heroDeltaColor:S.heroDeltaColor, heroDeltaBg:S.heroDeltaBg, heroDeltaBorder:S.heroDeltaBorder, sparkAreaD:sp.area, sparkLineD:sp.line, sparkProjD:sp.projPath, dotXD:sp.lastX, dotYD:sp.lastY,
+      const S=(window.TRANSSAN_DATA.summary)||{}; mes={ heroLL:S.heroLL, todayDM:S.todayDM, curMonthLabel:S.curMonthLabel, tracEstimateFmt:S.tracEstimateFmt, sanralBalanceFmt:S.sanralBalanceFmt, totalPortagensFmt:S.totalPortagensFmt, dayLabel:S.dayLabel, heroPrev:S.heroPrev, heroDay:S.heroDay, heroDelta:S.heroDelta, prevMonthLabel:S.prevMonthLabel, vsBadge:S.vsBadge, vsBadgeColor:S.vsBadgeColor, heroArrow:S.heroArrow, heroDeltaColor:S.heroDeltaColor, heroDeltaBg:S.heroDeltaBg, heroDeltaBorder:S.heroDeltaBorder, sparkGhostD:sp.ghost, sparkAreaD:sp.area, sparkLineD:sp.line, sparkProjD:sp.projPath, dotXD:sp.lastX, dotYD:sp.lastY,
         paceProj:S.paceProj, paceBarPct:S.paceBarPct, pacePct:S.pacePct,
         kpis:S.kpis,
         today:{ viagens:todayTrips.length, tons:ttons.toFixed(0), ll:this.fmtK(tll), delta:_deltaStr, deltaColor:_deltaColor, mix:_mixStr, trips:todayTrips, activeCount:activeN, totalDrivers:data.length, ausentesNames:ausentes.slice(0,4).join(', ')+' +'+(ausentes.length-4) },
