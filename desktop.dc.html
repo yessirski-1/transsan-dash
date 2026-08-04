@@ -16,7 +16,7 @@
   body{margin:0;background:#08090c;font-family:'Archivo',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
   ::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:#23272f;border-radius:4px}
 </style>
-<script src="transsan-data.js?v=1785841959"></script><script src="transsan-trips.js?v=1785841959"></script><script src="frota-data.js?v=1785841959"></script>
+<script src="transsan-data.js?v=1785873353"></script><script src="transsan-trips.js?v=1785873353"></script><script src="frota-data.js?v=1785873353"></script>
 
 </helmet>
 <template id="__bundler_thumbnail" data-bg-color="#08090c">
@@ -61,7 +61,7 @@
           <div style="font-family:'Spline Sans Mono',monospace;font-size:60px;font-weight:600;color:#f4f6f8;letter-spacing:-.02em;line-height:1.1;padding-bottom:3px">{{ heroLL }}</div>
           <div style="display:flex;align-items:center;gap:5px;background:rgba(70,179,94,0.12);border:0.5px solid rgba(70,179,94,0.3);border-radius:8px;padding:5px 9px;margin-bottom:8px"><span style="color:#52c06a;font-size:12px">▲</span><span style="color:#52c06a;font-size:13px;font-weight:700">{{ heroDelta }}</span></div>
         </div>
-        <div style="font-family:'Spline Sans Mono',monospace;font-size:12px;color:#6a7079;margin-top:8px">MT · vs <span style="color:#9aa0ab">{{ heroPrev }}</span> em Maio (até dia {{ heroDay }})</div>
+        <div style="font-family:'Spline Sans Mono',monospace;font-size:12px;color:#6a7079;margin-top:8px">MT · vs <span style="color:#9aa0ab">{{ heroPrev }}</span> em {{ prevMonthLabel }} (até dia {{ heroDay }})</div>
         <div style="margin-top:18px">
           <div style="display:flex;justify-content:space-between;align-items:center"><div style="font-size:11px;color:#6a7079">Ritmo do mês · dia {{ dayLabel }}</div><div style="font-family:'Spline Sans Mono',monospace;font-size:12px;color:var(--ac,#e0a93b);font-weight:600">{{ paceProj }} proj.</div></div>
           <div style="height:6px;border-radius:3px;background:#1c212a;margin-top:8px;overflow:hidden"><div style="width:{{ paceBarPct }}%;height:100%;background:var(--ac,#e0a93b);border-radius:3px"></div></div>
@@ -133,7 +133,7 @@
       <div style="display:flex;flex-direction:column;gap:18px">
         <!-- vs Maio -->
         <div style="background:#11141a;border:0.5px solid #1f242d;border-radius:16px;padding:20px">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px"><div style="font-size:12px;letter-spacing:.12em;color:#8a909a;font-weight:700;text-transform:uppercase">vs Maio</div><div style="font-size:12px;color:#52c06a;font-weight:600">▲ +257k MT (+4%)</div></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px"><div style="font-size:12px;letter-spacing:.12em;color:#8a909a;font-weight:700;text-transform:uppercase">vs {{ prevMonthLabel }}</div><div style="font-size:12px;color:{{ vsBadgeColor }};font-weight:600">{{ vsBadge }}</div></div>
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:11px">
             <sc-for list="{{ vs }}" as="v" hint-placeholder-count="4">
               <div style="background:#0f131a;border-radius:11px;padding:13px"><div style="font-size:9px;letter-spacing:.06em;color:#5f646e;text-transform:uppercase">{{ v.l }}</div><div style="font-family:'Spline Sans Mono',monospace;font-size:17px;color:#e7eaee;margin-top:4px;font-weight:500">{{ v.val }}</div><div style="font-family:'Spline Sans Mono',monospace;font-size:9.5px;color:#5f646e;margin-top:2px">{{ v.prev }}</div><div style="font-size:11px;color:#52c06a;font-weight:700;margin-top:5px">{{ v.delta }}</div></div>
